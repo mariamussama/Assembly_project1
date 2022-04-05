@@ -49,15 +49,15 @@ void read_initial(ifstream& reg, ifstream& memory, unordered_map<string, int>& R
 		*/
 }
 
-int add_fun(int input1, int input2)
+int add_fun(string inst)
 {
-	int output = input1 + input2;
+	int output;// = input1 + input2;
 	return ouput;
 }
-void operations(string op, int input1, int input2)
+void operation_divider(string inst)
 {
 	if (op == "add")
-		output = add_fun(input1, input2)
+		output = add_fun(inst);
 }
 
 int main()
