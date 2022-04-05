@@ -48,6 +48,18 @@ void read_initial(ifstream& reg, ifstream& memory, unordered_map<string, int>& R
 		cout << x.first << " " << x.second << endl;
 		*/
 }
+
+int add_fun(int input1, int input2)
+{
+	int output = input1 + input2;
+	return ouput;
+}
+void operations(string op, int input1, int input2)
+{
+	if (op == "add")
+		output = add_fun(input1, input2)
+}
+
 int main()
 {
 	ifstream inst("instructions.txt");
