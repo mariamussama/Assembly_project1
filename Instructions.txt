@@ -10,3 +10,41 @@ lw x9, 0(x10)
 bne x9, x24, Exit
 addi x22, x22, 1
 beq x0, x0, Loop
+lui x7, 6
+auipc x8, 4
+jal x6, label
+jalr x7, 7(x5)
+beq x3, x2, label
+bne x3, x2, label
+blt x3, x2, label
+bge x3, x2, label
+bltu x3, x2, label
+bgeu x3, x2, label
+lb x10, 5(x8)
+lh x10, 5(x8)
+lw x10, 5(x8)
+lbu x10, 5(x8)
+lhu x10, 5(x8)
+sb x7, 10(x2)
+sh x7, 10(x2)
+sw x7, 10(x2)
+addi x1, x2, 4
+slti x1, x2, 4
+sltiu x1, x2, 4
+xori x1, x2, 4
+ori x1, x2, 4
+andi x1, x2, 4
+slli x5, x3, 2
+srli x5, x3, 2
+srai x5, x3, 2
+exit: lb x10, 5(x8)
+add x1, x2, x3
+sub x1, x2, x3
+sll x1, x2, x3
+slt x1, x2, x3
+sltu x1, x2, x3
+xor x1, x2, x3
+srl x1, x2, x3
+sra x1, x2, x3
+or x1, x2, x3
+and x1, x2, x3
