@@ -3,6 +3,7 @@
 #include<string>
 #include<fstream>
 using namespace std;
+//determine the operation 
 void det_op(string& operation, string line) //extract label and operation
 {
 	string Temp = "";
@@ -19,6 +20,7 @@ void det_op(string& operation, string line) //extract label and operation
 	}
 	operation = Temp;
 }
+//determine the label if any
 void det_label(string& label, string line)
 {
 	string temp = "";
@@ -36,6 +38,7 @@ void det_label(string& label, string line)
 	}
 }
 
+//read instructions and save them in the corresponding unordered map(lines) and labels
 void read_instruction(ifstream& file, unordered_map<int, string>& lines, unordered_map<string, int>& label)
 {
 	string inst,lab="";
@@ -49,7 +52,7 @@ void read_instruction(ifstream& file, unordered_map<int, string>& lines, unorder
 			lines[i] = inst;
 			det_label(lab, inst);
 			if (lab!="")
-				label[lab] = i;
+				label[lab] = i;//save labels and their corresponding instruction no.
 			i = i + 4;
 		}
 		
@@ -58,6 +61,7 @@ void read_instruction(ifstream& file, unordered_map<int, string>& lines, unorder
 		//cout << x.first << " " << x.second << endl;
 
 }
+//read the initial values of some reg and memory locations
 void read_initial(ifstream& reg, ifstream& memory, unordered_map<string, int>& R, unordered_map<int, int>& M)
 {
 	string inst;
@@ -86,7 +90,7 @@ void read_initial(ifstream& reg, ifstream& memory, unordered_map<string, int>& R
 			*/
 }
 
-
+//instruction divider to get the registers/ offsets/ labels....
 void three_reg(string& rd, string& rs1, string& rs2, string Inst, string op) //all instructions that deal with three registers
 {
 	vector<string>reg;
@@ -312,397 +316,325 @@ void LUI_AUIPC(string& rd, int& val, string Inst, string op) //LUI and AUIPC ins
 	val = stoi(reg[1]);
 }
 
-
-int add_inst(string inst) // addition instruction 
+//the operations fuunctions
+void add_inst(string inst) // addition instruction 
 {
 	cout << "add" << endl;
-	int output = 0; string rd, rs1, rs2;
+	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "add");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int sub_inst(string inst)  // subtraction instruction
+void sub_inst(string inst)  // subtraction instruction
 {
 	cout << "sub" << endl;
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sub");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int sll_inst(string inst) // shift left logical instruction 
+void sll_inst(string inst) // shift left logical instruction 
 {
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sll");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int slt_inst(string inst) // set less than instruction
+void slt_inst(string inst) // set less than instruction
 {
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "slt");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int sltu_inst(string inst) // set less than unsigned instruction
+void sltu_inst(string inst) // set less than unsigned instruction
 {
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sltu");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int xor_inst(string inst) // exclusive or instruction 
+void xor_inst(string inst) // exclusive or instruction 
 {
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "xor");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int srl_inst(string inst) // shift right logical instruction
+void srl_inst(string inst) // shift right logical instruction
 {
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "srl");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int sra_inst(string inst) // shift right arithmetic instruction 
+void sra_inst(string inst) // shift right arithmetic instruction 
 {
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sra");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int or_inst(string inst) // or instruction
+void or_inst(string inst) // or instruction
 {
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "or");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
-int and_inst(string inst) // and instruction 
+void and_inst(string inst) // and instruction 
 {
-	int output=0;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "and");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
-	return output;
 }
 /////////////////////////////////
-int slli_inst(string inst) // shift left logical immediate instruction  
+void slli_inst(string inst) // shift left logical immediate instruction  
 {
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "slli");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
-int srli_inst(string inst) // shift right logical immediate instrucrtion 
+void srli_inst(string inst) // shift right logical immediate instrucrtion 
 {
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "srli");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
-int srai_inst(string inst) // shfit right arethmetic instruction 
+void srai_inst(string inst) // shfit right arethmetic instruction 
 {
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "srai");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
 /////////////////////////////////
-int addi_inst(string inst) // add immediate instruction 
+void addi_inst(string inst) // add immediate instruction 
 {
 	cout << "addi" << endl;
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "addi");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
-int slti_inst(string inst) // set if less than immediate instruction 
+void slti_inst(string inst) // set if less than immediate instruction 
 {
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "slti");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
-int sltiu_inst(string inst) // set if less than unsigned immediate instruction 
+void sltiu_inst(string inst) // set if less than unsigned immediate instruction 
 {
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "sltiu");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
-int xori_inst(string inst) // exclusive or immediate instruction 
+void xori_inst(string inst) // exclusive or immediate instruction 
 {
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "xori");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
-int ori_inst(string inst) // or immediate instruction 
+void ori_inst(string inst) // or immediate instruction 
 {
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "ori");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
-int andi_inst(string inst) // and immediate instruction 
+void andi_inst(string inst) // and immediate instruction 
 {
-	int output=0;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "andi");
 	cout << rd << " " << rs1 << " " << val << endl;
-	return output;
 }
 /////////////////////////////////
-int sb_inst(string inst) // store byte instruction 
+void sb_inst(string inst) // store byte instruction 
 {
-	int output=0;
 	string rs1, rs2; int offset;
 	load_op(rs1, rs2, offset, inst,"sb");
 	cout << rs1 << " " << rs2 << " " << offset << endl;
-	return output;
 }
-int sh_inst(string inst) // store halfword instruction 
+void sh_inst(string inst) // store halfword instruction 
 {
-	int output=0;
 	string rs1, rs2; int offset;
 	load_op(rs1, rs2, offset, inst, "sh");
 	cout << rs1 << " " << rs2 << " " << offset << endl;
-	return output;
 }
-int sw_inst(string inst) // store word instruction 
+void sw_inst(string inst) // store word instruction 
 {
-	int output=0;
 	string rs1, rs2; int offset;
 	load_op(rs1, rs2, offset, inst, "sw");
 	cout << rs1 << " " << rs2 << " " << offset << endl;
-	return output;
 }
 /////////////////////////////////
-int lb_inst(string inst) //  load byte instruction 
+void lb_inst(string inst) //  load byte instruction 
 {
-	int output=0;
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lb");
 	cout << rd << " " << rs1 << " " << offset << endl;
-	return output;
 }
-int lh_inst(string inst) //  load halfword instruction 
+void lh_inst(string inst) //  load halfword instruction 
 {
-	int output=0;
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lh");
 	cout << rd << " " << rs1 << " " << offset << endl;
-	return output;
 }
-int lw_inst(string inst) // load word instruction 
+void lw_inst(string inst) // load word instruction 
 {
 	cout << "lw" << endl;
-	int output=0;
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lw");
 	cout << rd << " " << rs1 << " " << offset << endl;
-	return output;
 }
-int lbu_inst(string inst) // load byte unsigned instruction 
+void lbu_inst(string inst) // load byte unsigned instruction 
 {
-	int output=0;
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lbu");
 	cout << rd << " " << rs1 << " " << offset << endl;
-	return output;
 }
-int lhu_inst(string inst) // load halfword unsigne instruction 
+void lhu_inst(string inst) // load halfword unsigne instruction 
 {
-	int output=0;
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lhu");
 	cout << rd << " " << rs1 << " " << offset << endl;
-	return output;
 }
 /////////////////////////////////
-int beq_inst(string inst) // branch if equal instruction (==)
+void beq_inst(string inst) // branch if equal instruction (==)
 {
 	cout << "beq" << endl;
-	int output=0;
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "beq");
 	cout << rs1 << " " << rs2 << " " << label << endl;
-	return output;
 }
-int bne_inst(string inst) // branch if not equal instruction (!=)
+void bne_inst(string inst) // branch if not equal instruction (!=)
 {
 	cout << "bne" << endl;
-	int output=0;
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "bne");
 	cout << rs1 << " " << rs2 << " " << label << endl;
-	return output;
 }
-int blt_inst(string inst) // branch if less than instruction(<)
+void blt_inst(string inst) // branch if less than instruction(<)
 {
-	int output=0;
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "blt");
 	cout << rs1 << " " << rs2 << " " << label << endl;
-	return output;
 }
-int bge_inst(string inst) // branch if greater than or equal instruction (>=)
+void bge_inst(string inst) // branch if greater than or equal instruction (>=)
 {
-	int output=0;
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "bge");
 	cout << rs1 << " " << rs2 << " " << label << endl;
-	return output;
 }
-int bltu_inst(string inst) // branch if less than using unsigned numbers instruction
+void bltu_inst(string inst) // branch if less than using unsigned numbers instruction
 {
-	int output=0;
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "bltu");
 	cout << rs1 << " " << rs2 << " " << label << endl;
-	return output;
 }
-int bgeu_inst(string inst) //branch if greater than or equal using unsigned numbers instruction
+void bgeu_inst(string inst) //branch if greater than or equal using unsigned numbers instruction
 {
-	int output=0;
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "bgeu");
 	cout << rs1 << " " << rs2 << " " << label << endl;
-	return output;
 }
 /////////////////////////////////
-int jalr_inst(string inst) // jump and link register instruction 
+void jalr_inst(string inst) // jump and link register instruction 
 {
-	int output=0;
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "jalr");
 	cout << rd << " " << rs1 << " " << offset << endl;
-	return output;
 }
 /////////////////////////////////
-int jal_inst(string inst) // jump and link instruction 
+void jal_inst(string inst) // jump and link instruction 
 {
-	int output=0;
 	string rd, label;
 	Jal_op(rd, label, inst, "jal");
 	cout << rd << " " << label << endl;
-	return output;
 }
 /////////////////////////////////
-int lui_inst(string inst) // load upper immediate instruction 
+void lui_inst(string inst) // load upper immediate instruction 
 {
-	int output = 0;
 	string rd; int val;
 	LUI_AUIPC(rd, val, inst, "lui");
 	cout << rd << " " << val << endl;
-	return output;
 }
-int auipc_inst(string inst) // add upper immediate to PC instruction 
+void auipc_inst(string inst) // add upper immediate to PC instruction 
 {
-	int output=0;
 	string rd; int val;
 	LUI_AUIPC(rd, val, inst, "auipc");
 	cout << rd << " " << val << endl;
-	return output;
 }
 /////////////////////////////////
-void operation_divider(string inst) // string of the instruction type will be the input of this function that automaticlly calles the specofoc function for that operation 
+//divider function that call the operation function based on the operation
+void operation_divider(string inst) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
 {
 	int output;
 	string op;
 	det_op(op, inst);
 	//cout << op << endl;
 	if (op == "add")
-		output = add_inst(inst);
+		add_inst(inst);
 	if (op == "sub")
-		output = sub_inst(inst);
+		sub_inst(inst);
 	if (op == "sll")
-		output = sll_inst(inst);
+		sll_inst(inst);
 	if (op == "slt")
-		output = slt_inst(inst);
+		slt_inst(inst);
 	if (op == "sltu")
-		output = sltu_inst(inst);
+		sltu_inst(inst);
 	if (op == "xor")
-		output = xor_inst(inst);
+		xor_inst(inst);
 	if (op == "srl")
-		output = srl_inst(inst);
+		srl_inst(inst);
 	if (op == "sra")
-		output = sra_inst(inst);
+		sra_inst(inst);
 	if (op == "or")
-		output = or_inst(inst);
+		or_inst(inst);
 	if (op == "and")
-		output = and_inst(inst);
+		and_inst(inst);
 	if (op == "slli")
-		output = slli_inst(inst);
+		slli_inst(inst);
 	if (op == "srli")
-		output = srli_inst(inst);
+		srli_inst(inst);
 	if (op == "srai")
-		output = srai_inst(inst);
+		srai_inst(inst);
 	if (op == "addi")
-		output = addi_inst(inst);
+		addi_inst(inst);
 	if (op == "slti")
-		output = slti_inst(inst);
+		slti_inst(inst);
 	if (op == "sltiu")
-		output = sltiu_inst(inst);
+		sltiu_inst(inst);
 	if (op == "xori")
-		output = xori_inst(inst);
+		xori_inst(inst);
 	if (op == "ori")
-		output = ori_inst(inst);
+		ori_inst(inst);
 	if (op == "andi")
-		output = andi_inst(inst);
+		andi_inst(inst);
 	if (op == "sb")
-		output = sb_inst(inst);
+		sb_inst(inst);
 	if (op == "sh")
-		output = sh_inst(inst);
+		sh_inst(inst);
 	if (op == "sw")
-		output = sw_inst(inst);
+		sw_inst(inst);
 	if (op == "lb")
-		output = lb_inst(inst);
+		lb_inst(inst);
 	if (op == "lh")
-		output = lh_inst(inst);
+		lh_inst(inst);
 	if (op == "lw")
-		output = lw_inst(inst);
+		lw_inst(inst);
 	if (op == "lbu")
-		output = lbu_inst(inst);
+		lbu_inst(inst);
 	if (op == "lhu")
-		output = lhu_inst(inst);
+		lhu_inst(inst);
 	if (op == "beq")
-		output = beq_inst(inst);
+		beq_inst(inst);
 	if (op == "bne")
-		output = bne_inst(inst);
+		bne_inst(inst);
 	if (op == "blt")
-		output = blt_inst(inst);
+		blt_inst(inst);
 	if (op == "bge")
-		output = bge_inst(inst);
+		bge_inst(inst);
 	if (op == "bltu")
-		output = bltu_inst(inst);
+		bltu_inst(inst);
 	if (op == "bgeu")
-		output = bgeu_inst(inst);
+		bgeu_inst(inst);
 	if (op == "jalr")
-		output = jalr_inst(inst);
+		jalr_inst(inst);
 	if (op == "jal")
-		output = jal_inst(inst);
+		jal_inst(inst);
 	if (op == "lui")
-		output = lui_inst(inst);
+		lui_inst(inst);
 	if (op == "auipc")
-		output = auipc_inst(inst);
+		auipc_inst(inst);
 }
 
 
