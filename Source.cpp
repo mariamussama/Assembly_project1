@@ -337,10 +337,14 @@ void sll_inst(string inst) // shift left logical instruction
 	three_reg(rd, rs1, rs2, inst, "sll");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void slt_inst(string inst) // set less than instruction
+void slt_inst(string inst, unordered_map<string, int>& reg) // set less than instruction
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "slt");
+	if (reg.at(rs1) < reg.at(rs2))
+		reg[rd] = 1;
+	else
+		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sltu_inst(string inst) // set less than unsigned instruction
@@ -355,10 +359,11 @@ void xor_inst(string inst) // exclusive or instruction
 	three_reg(rd, rs1, rs2, inst, "xor");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void srl_inst(string inst) // shift right logical instruction
+void srl_inst(string inst, unordered_map<string, int>& reg) // shift right logical instruction
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "srl");
+	reg[rd] = reg.at(rs1)/(pow(2,reg.at(rs2)));
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sra_inst(string inst) // shift right arithmetic instruction 
@@ -367,10 +372,14 @@ void sra_inst(string inst) // shift right arithmetic instruction
 	three_reg(rd, rs1, rs2, inst, "sra");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void or_inst(string inst) // or instruction
+void or_inst(string inst, unordered_map<string, int>& reg) // or instruction
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "or");
+	if (reg.at(rs1) || reg.at(rs2))
+		reg[rd] = 1;
+	else 
+		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void and_inst(string inst) // and instruction 
@@ -386,10 +395,11 @@ void slli_inst(string inst) // shift left logical immediate instruction
 	imm_op(rd, rs1, val, inst, "slli");
 	cout << rd << " " << rs1 << " " << val << endl;
 }
-void srli_inst(string inst) // shift right logical immediate instrucrtion 
+void srli_inst(string inst, unordered_map<string, int>& reg) // shift right logical immediate instrucrtion 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "srli");
+	reg[rd] = reg.at(rs1) / (pow(2, val));
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 void srai_inst(string inst) // shfit right arethmetic instruction 
@@ -555,7 +565,7 @@ void auipc_inst(string inst) // add upper immediate to PC instruction
 }
 /////////////////////////////////
 //divider function that call the operation function based on the operation
-void operation_divider(string inst) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
+void operation_divider(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, unordered_map<int, int>& memory) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
 {
 	int output;
 	string op;
@@ -568,23 +578,23 @@ void operation_divider(string inst) // string of the instruction type will be th
 	if (op == "sll")
 		sll_inst(inst);
 	if (op == "slt")
-		slt_inst(inst);
+		slt_inst(inst,reg);
 	if (op == "sltu")
 		sltu_inst(inst);
 	if (op == "xor")
 		xor_inst(inst);
 	if (op == "srl")
-		srl_inst(inst);
+		srl_inst(inst,reg);
 	if (op == "sra")
 		sra_inst(inst);
 	if (op == "or")
-		or_inst(inst);
+		or_inst(inst, reg);
 	if (op == "and")
 		and_inst(inst);
 	if (op == "slli")
 		slli_inst(inst);
 	if (op == "srli")
-		srli_inst(inst);
+		srli_inst(inst,reg);
 	if (op == "srai")
 		srai_inst(inst);
 	if (op == "addi")
