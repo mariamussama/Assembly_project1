@@ -1,5 +1,5 @@
 #include<iostream>
-#include <unordered_map>
+#include<unordered_map>
 #include<string>
 #include<fstream>
 using namespace std;
@@ -12,7 +12,8 @@ void det_op(string& operation, string line) //extract label and operation
 	{
 		if (line[i] == ':')
 		{
-			Temp = ""; i++;
+			Temp = ""; 
+			i++;
 		}
 		else
 			Temp = Temp + line[i];
@@ -317,18 +318,20 @@ void LUI_AUIPC(string& rd, int& val, string Inst, string op) //LUI and AUIPC ins
 }
 
 //the operations fuunctions
-void add_inst(string inst) // addition instruction 
+void add_inst(string inst, unordered_map<string, int>& reg) // addition instruction 
 {
 	cout << "add" << endl;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "add");
+	reg[rd] = reg.at(rs1) + reg.at(rs2);
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void sub_inst(string inst)  // subtraction instruction
+void sub_inst(string inst, unordered_map<string, int>& reg)  // subtraction instruction
 {
 	cout << "sub" << endl;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sub");
+	reg[rd] = reg.at(rs1) - reg.at(rs2);
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sll_inst(string inst, unordered_map<string, int>& reg) // shift left logical instruction 
@@ -348,10 +351,14 @@ void slt_inst(string inst, unordered_map<string, int>& reg) // set less than ins
 		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void sltu_inst(string inst) // set less than unsigned instruction
+void sltu_inst(string inst, unordered_map<string, int>& reg) // set less than unsigned instruction
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sltu");
+	if (reg.at(abs(rs1)) < reg.at(abs(rs2)))
+		reg[rd] = 1;
+	else
+		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void xor_inst(string inst, unordered_map<string, int>& reg) // exclusive or instruction 
@@ -384,14 +391,18 @@ void or_inst(string inst, unordered_map<string, int>& reg) // or instruction
 	three_reg(rd, rs1, rs2, inst, "or");
 	if (reg.at(rs1) || reg.at(rs2))
 		reg[rd] = 1;
-	else 
+	else
 		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void and_inst(string inst) // and instruction 
+void and_inst(string inst, unordered_map<string, int>& reg) // and instruction 
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "and");
+	if (reg.at(rs1) && reg.at(rs2))
+		reg[rd] = 1;
+	else
+		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 /////////////////////////////////
@@ -409,7 +420,7 @@ void srli_inst(string inst, unordered_map<string, int>& reg) // shift right logi
 	reg[rd] = reg.at(rs1) / (pow(2, val));
 	cout << rd << " " << rs1 << " " << val << endl;
 }
-void srai_inst(string inst, unordered_map<string, int>& reg) // shfit right arethmetic instruction 
+void srai_inst(string inst, unordered_map<string, int>& reg) // shift right arethmetic immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "srai");
@@ -417,11 +428,12 @@ void srai_inst(string inst, unordered_map<string, int>& reg) // shfit right aret
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 /////////////////////////////////
-void addi_inst(string inst) // add immediate instruction 
+void addi_inst(string inst, unordered_map<string, int>& reg) // add immediate instruction 
 {
 	cout << "addi" << endl;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "addi");
+	reg[rd] = reg.at(rs1) + val;
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 void slti_inst(string inst) // set if less than immediate instruction 
@@ -430,10 +442,14 @@ void slti_inst(string inst) // set if less than immediate instruction
 	imm_op(rd, rs1, val, inst, "slti");
 	cout << rd << " " << rs1 << " " << val << endl;
 }
-void sltiu_inst(string inst) // set if less than unsigned immediate instruction 
+void sltiu_inst(string inst, unordered_map<string, int>& reg) // set if less than unsigned immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "sltiu");
+	if (reg.at(abs(rs1)) < abs(val)))
+		reg[rd] = 1;
+	else
+		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 void xori_inst(string inst) // exclusive or immediate instruction 
@@ -448,10 +464,14 @@ void ori_inst(string inst) // or immediate instruction
 	imm_op(rd, rs1, val, inst, "ori");
 	cout << rd << " " << rs1 << " " << val << endl;
 }
-void andi_inst(string inst) // and immediate instruction 
+void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "andi");
+	if (reg.at(rs1) && val)
+		reg[rd] = 1;
+	else
+		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 /////////////////////////////////
