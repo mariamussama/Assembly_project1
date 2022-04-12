@@ -2,6 +2,7 @@
 #include<unordered_map>
 #include<string>
 #include<fstream>
+#include <cstdlib>
 using namespace std;
 //determine the operation 
 void det_op(string& operation, string line) //extract label and operation
@@ -355,7 +356,7 @@ void sltu_inst(string inst, unordered_map<string, int>& reg) // set less than un
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sltu");
-	if (reg.at(abs(rs1)) < reg.at(abs(rs2)))
+	if (abs(reg.at(rs1)) < abs(reg.at(rs2)))
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
@@ -436,17 +437,21 @@ void addi_inst(string inst, unordered_map<string, int>& reg) // add immediate in
 	reg[rd] = reg.at(rs1) + val;
 	cout << rd << " " << rs1 << " " << val << endl;
 }
-void slti_inst(string inst) // set if less than immediate instruction 
+void slti_inst(string inst, unordered_map<string, int>& reg) // set if less than immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "slti");
+	if (reg.at(rs1) < val)
+		reg[rd] = 1;
+	else
+		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 void sltiu_inst(string inst, unordered_map<string, int>& reg) // set if less than unsigned immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "sltiu");
-	if (reg.at(abs(rs1)) < abs(val)))
+	if (abs(reg.at(rs1)) < abs(val))
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
@@ -458,10 +463,14 @@ void xori_inst(string inst) // exclusive or immediate instruction
 	imm_op(rd, rs1, val, inst, "xori");
 	cout << rd << " " << rs1 << " " << val << endl;
 }
-void ori_inst(string inst) // or immediate instruction 
+void ori_inst(string inst, unordered_map<string, int>& reg) // or immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "ori");
+	if (reg.at(rs1) || val)
+		reg[rd] = 1;
+	else
+		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate instruction 
@@ -600,15 +609,15 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	det_op(op, inst);
 	//cout << op << endl;
 	if (op == "add")
-		add_inst(inst);
+		add_inst(inst,reg);
 	if (op == "sub")
-		sub_inst(inst);
+		sub_inst(inst,reg);
 	if (op == "sll")
 		sll_inst(inst,reg);
 	if (op == "slt")
 		slt_inst(inst,reg);
 	if (op == "sltu")
-		sltu_inst(inst);
+		sltu_inst(inst,reg);
 	if (op == "xor")
 		xor_inst(inst, reg);
 	if (op == "srl")
@@ -618,7 +627,7 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "or")
 		or_inst(inst, reg);
 	if (op == "and")
-		and_inst(inst);
+		and_inst(inst,reg);
 	if (op == "slli")
 		slli_inst(inst, reg);
 	if (op == "srli")
@@ -626,17 +635,17 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "srai")
 		srai_inst(inst,reg);
 	if (op == "addi")
-		addi_inst(inst);
+		addi_inst(inst,reg);
 	if (op == "slti")
-		slti_inst(inst);
+		slti_inst(inst,reg);
 	if (op == "sltiu")
-		sltiu_inst(inst);
+		sltiu_inst(inst,reg);
 	if (op == "xori")
 		xori_inst(inst);
 	if (op == "ori")
-		ori_inst(inst);
+		ori_inst(inst,reg);
 	if (op == "andi")
-		andi_inst(inst);
+		andi_inst(inst,reg);
 	if (op == "sb")
 		sb_inst(inst);
 	if (op == "sh")
@@ -689,10 +698,10 @@ int main()
 	read_initial(reg_init, memory_init, reg, memory);
 	for (auto x : lines)
 	{
-		string op, label;
+		//string op, label;
 		cout << x.first << " " << x.second << endl;
 		//det_op(op, x.second);
-		operation_divider(x.second);
+		operation_divider(x.second,reg,label,memory);
 		//cout << op << endl;
 	}
 	for (auto x : label)
