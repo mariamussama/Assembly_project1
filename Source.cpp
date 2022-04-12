@@ -331,10 +331,11 @@ void sub_inst(string inst)  // subtraction instruction
 	three_reg(rd, rs1, rs2, inst, "sub");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void sll_inst(string inst) // shift left logical instruction 
+void sll_inst(string inst, unordered_map<string, int>& reg) // shift left logical instruction 
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sll");
+	reg[rd] = reg.at(rs1) * pow(2, reg.at(rs2));
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void slt_inst(string inst, unordered_map<string, int>& reg) // set less than instruction
@@ -353,10 +354,14 @@ void sltu_inst(string inst) // set less than unsigned instruction
 	three_reg(rd, rs1, rs2, inst, "sltu");
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void xor_inst(string inst) // exclusive or instruction 
+void xor_inst(string inst, unordered_map<string, int>& reg) // exclusive or instruction 
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "xor");
+	if (reg.at(rs1) == reg.at(rs2))
+		reg[rd] = 0;
+	else
+		reg[rd] = 1;
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void srl_inst(string inst, unordered_map<string, int>& reg) // shift right logical instruction
@@ -366,10 +371,11 @@ void srl_inst(string inst, unordered_map<string, int>& reg) // shift right logic
 	reg[rd] = reg.at(rs1)/(pow(2,reg.at(rs2)));
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
-void sra_inst(string inst) // shift right arithmetic instruction 
+void sra_inst(string inst, unordered_map<string, int>& reg) // shift right arithmetic instruction 
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sra");
+	reg[rd] = reg.at(rs1) / pow(2, reg.at(rs2));
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void or_inst(string inst, unordered_map<string, int>& reg) // or instruction
@@ -389,10 +395,11 @@ void and_inst(string inst) // and instruction
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 /////////////////////////////////
-void slli_inst(string inst) // shift left logical immediate instruction  
+void slli_inst(string inst, unordered_map<string, int>& reg) // shift left logical immediate instruction  
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "slli");
+	reg[rd] = reg.at(rs1) * pow(2, val);
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 void srli_inst(string inst, unordered_map<string, int>& reg) // shift right logical immediate instrucrtion 
@@ -402,10 +409,11 @@ void srli_inst(string inst, unordered_map<string, int>& reg) // shift right logi
 	reg[rd] = reg.at(rs1) / (pow(2, val));
 	cout << rd << " " << rs1 << " " << val << endl;
 }
-void srai_inst(string inst) // shfit right arethmetic instruction 
+void srai_inst(string inst, unordered_map<string, int>& reg) // shfit right arethmetic instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "srai");
+	reg[rd] = reg.at(rs1) / pow(2, val);
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 /////////////////////////////////
@@ -576,27 +584,27 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "sub")
 		sub_inst(inst);
 	if (op == "sll")
-		sll_inst(inst);
+		sll_inst(inst,reg);
 	if (op == "slt")
 		slt_inst(inst,reg);
 	if (op == "sltu")
 		sltu_inst(inst);
 	if (op == "xor")
-		xor_inst(inst);
+		xor_inst(inst, reg);
 	if (op == "srl")
 		srl_inst(inst,reg);
 	if (op == "sra")
-		sra_inst(inst);
+		sra_inst(inst, reg);
 	if (op == "or")
 		or_inst(inst, reg);
 	if (op == "and")
 		and_inst(inst);
 	if (op == "slli")
-		slli_inst(inst);
+		slli_inst(inst, reg);
 	if (op == "srli")
 		srli_inst(inst,reg);
 	if (op == "srai")
-		srai_inst(inst);
+		srai_inst(inst,reg);
 	if (op == "addi")
 		addi_inst(inst);
 	if (op == "slti")
