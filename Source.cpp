@@ -457,10 +457,14 @@ void sltiu_inst(string inst, unordered_map<string, int>& reg) // set if less tha
 		reg[rd] = 0;
 	cout << rd << " " << rs1 << " " << val << endl;
 }
-void xori_inst(string inst) // exclusive or immediate instruction 
+void xori_inst(string inst, unordered_map<string, int>& reg) // exclusive or immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "xori");
+	if (reg.at(rs1) == val)
+		reg[rd] = 0;
+	else
+		reg[rd] = 1;
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 void ori_inst(string inst, unordered_map<string, int>& reg) // or immediate instruction 
@@ -641,7 +645,7 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "sltiu")
 		sltiu_inst(inst,reg);
 	if (op == "xori")
-		xori_inst(inst);
+		xori_inst(inst,reg);
 	if (op == "ori")
 		ori_inst(inst,reg);
 	if (op == "andi")
