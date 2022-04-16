@@ -3,6 +3,7 @@
 #include<string>
 #include<fstream>
 #include <cstdlib>
+#include <cstdint>
 using namespace std;
 //determine the operation 
 void det_op(string& operation, string line) //extract label and operation
@@ -493,7 +494,8 @@ void sb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 {
 	string rs1, rs2; int offset;
 	load_op(rs1, rs2, offset, inst,"sb");
-	memory[reg.at(rs2) + offset] = reg.at(rs1);
+	int8_t temp = reg.at(rs1);
+	memory[reg.at(rs2) + offset] = temp;
 	cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sh_inst(string inst) // store halfword instruction 
@@ -513,7 +515,8 @@ void lb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lb");
-	reg[rd] = memory.at(reg.at(rs1)+ offset);
+	int8_t temp = memory.at(reg.at(rs1) + offset);
+	reg[rd] = temp;
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lh_inst(string inst) //  load halfword instruction 
@@ -533,7 +536,8 @@ void lbu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, i
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lbu");
-	reg[rd] =abs(memory.at(reg.at(rs1) + offset));
+	int8_t temp =abs(memory.at(reg.at(rs1) + offset));
+	reg[rd] = temp;
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lhu_inst(string inst) // load halfword unsigne instruction 
