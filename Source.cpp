@@ -562,11 +562,15 @@ void beq_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 	}
 	cout << rs1 << " " << rs2 << " " << lab << endl;
 }
-void bne_inst(string inst) // branch if not equal instruction (!=)
+void bne_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if not equal instruction (!=)
 {
 	cout << "bne" << endl;
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "bne");
+	if (reg.at(rs1) != reg.at(rs2))
+	{
+		jump = label.at(lab);
+	}
 	cout << rs1 << " " << rs2 << " " << label << endl;
 }
 void blt_inst(string inst) // branch if less than instruction(<)
@@ -594,10 +598,13 @@ void bgeu_inst(string inst) //branch if greater than or equal using unsigned num
 	cout << rs1 << " " << rs2 << " " << label << endl;
 }
 /////////////////////////////////
-void jalr_inst(string inst) // jump and link register instruction 
+void jalr_inst(string inst, unordered_map<string, int>& reg, int& jump) // jump and link register instruction 
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "jalr");
+	reg[rd] = jump + 4;
+	jump = reg.at(rs1) + offset;
+	
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 /////////////////////////////////
@@ -611,10 +618,12 @@ void jal_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 	cout << rd << " " << lab << endl;
 }
 /////////////////////////////////
-void lui_inst(string inst) // load upper immediate instruction 
+void lui_inst(string inst, unordered_map<string, int>& reg) // load upper immediate instruction 
 {
 	string rd; int val;
 	LUI_AUIPC(rd, val, inst, "lui");
+	int16_t temp1 = val;
+	reg[rd] = temp1 * pow(2, 16);
 	cout << rd << " " << val << endl;
 }
 void auipc_inst(string inst, unordered_map<string, int>& reg, int& jump) // add upper immediate to PC instruction 
@@ -689,7 +698,7 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "beq")
 		beq_inst(inst, reg, label, jump);
 	if (op == "bne")
-		bne_inst(inst);
+		bne_inst(inst, reg, label, jump);
 	if (op == "blt")
 		blt_inst(inst);
 	if (op == "bge")
@@ -699,13 +708,15 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "bgeu")
 		bgeu_inst(inst);
 	if (op == "jalr")
-		jalr_inst(inst);
+		jalr_inst(inst, reg, jump);
 	if (op == "jal")
 		jal_inst(inst, reg, label, jump);
 	if (op == "lui")
-		lui_inst(inst);
+		lui_inst(inst,reg);
 	if (op == "auipc")
 		auipc_inst(inst,reg,jump);
+	if ((op == "fence") || (op == "ecall") || (op == "ebreak"))
+		jump = (lines.size() * 4);
 }
 
 
