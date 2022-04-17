@@ -3,6 +3,7 @@
 #include<string>
 #include<fstream>
 #include <cstdlib>
+#include <cstdint>
 using namespace std;
 //determine the operation 
 void det_op(string& operation, string line) //extract label and operation
@@ -324,7 +325,7 @@ void add_inst(string inst, unordered_map<string, int>& reg) // addition instruct
 	cout << "add" << endl;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "add");
-	reg[rd] = reg.at(rs1) + reg.at(rs2);
+	reg[rd] = reg.at(rs1)+ reg.at(rs2);
 	cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sub_inst(string inst, unordered_map<string, int>& reg)  // subtraction instruction
@@ -398,6 +399,7 @@ void or_inst(string inst, unordered_map<string, int>& reg) // or instruction
 }
 void and_inst(string inst, unordered_map<string, int>& reg) // and instruction 
 {
+	cout << "and" << endl;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "and");
 	if (reg.at(rs1) && reg.at(rs2))
@@ -488,10 +490,12 @@ void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate in
 	cout << rd << " " << rs1 << " " << val << endl;
 }
 /////////////////////////////////
-void sb_inst(string inst) // store byte instruction 
+void sb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store byte instruction 
 {
 	string rs1, rs2; int offset;
 	load_op(rs1, rs2, offset, inst,"sb");
+	int8_t temp = reg.at(rs1);
+	memory[reg.at(rs2) + offset] = temp;
 	cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sh_inst(string inst) // store halfword instruction 
@@ -509,10 +513,12 @@ void sw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 /////////////////////////////////
-void lb_inst(string inst) //  load byte instruction 
+void lb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) //  load byte instruction 
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lb");
+	int8_t temp = memory.at(reg.at(rs1) + offset);
+	reg[rd] = temp;
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lh_inst(string inst) //  load halfword instruction 
@@ -530,10 +536,12 @@ void lw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	reg[rd] = memory.at(addr);
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
-void lbu_inst(string inst) // load byte unsigned instruction 
+void lbu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load byte unsigned instruction 
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lbu");
+	int8_t temp =abs(memory.at(reg.at(rs1) + offset));
+	reg[rd] = temp;
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lhu_inst(string inst) // load halfword unsigne instruction 
@@ -543,12 +551,16 @@ void lhu_inst(string inst) // load halfword unsigne instruction
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 /////////////////////////////////
-void beq_inst(string inst) // branch if equal instruction (==)
+void beq_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if equal instruction (==)
 {
 	cout << "beq" << endl;
-	string rs1, rs2, label;
-	branch_op(rs1, rs2, label, inst, "beq");
-	cout << rs1 << " " << rs2 << " " << label << endl;
+	string rs1, rs2, lab;
+	branch_op(rs1, rs2, lab, inst, "beq");
+	if (reg.at(rs1) == reg.at(rs2))
+	{
+		jump = label.at(lab);
+	}
+	cout << rs1 << " " << rs2 << " " << lab << endl;
 }
 void bne_inst(string inst) // branch if not equal instruction (!=)
 {
@@ -589,11 +601,14 @@ void jalr_inst(string inst) // jump and link register instruction
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 /////////////////////////////////
-void jal_inst(string inst) // jump and link instruction 
+void jal_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int &jump) // jump and link instruction 
 {
-	string rd, label;
-	Jal_op(rd, label, inst, "jal");
-	cout << rd << " " << label << endl;
+	string rd, lab;
+	Jal_op(rd, lab, inst, "jal");
+	reg[rd] = jump + 4;
+	jump = label.at(lab);
+	cout << "jump" << endl << endl;
+	cout << rd << " " << lab << endl;
 }
 /////////////////////////////////
 void lui_inst(string inst) // load upper immediate instruction 
@@ -602,15 +617,16 @@ void lui_inst(string inst) // load upper immediate instruction
 	LUI_AUIPC(rd, val, inst, "lui");
 	cout << rd << " " << val << endl;
 }
-void auipc_inst(string inst) // add upper immediate to PC instruction 
+void auipc_inst(string inst, unordered_map<string, int>& reg, int& jump) // add upper immediate to PC instruction 
 {
 	string rd; int val;
 	LUI_AUIPC(rd, val, inst, "auipc");
+	reg[rd] = jump + val;
 	cout << rd << " " << val << endl;
 }
 /////////////////////////////////
 //divider function that call the operation function based on the operation
-void operation_divider(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, unordered_map<int, int>& memory) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
+void operation_divider(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, unordered_map<int, int>& memory, int &jump) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
 {
 	int output;
 	string op;
@@ -655,23 +671,23 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "andi")
 		andi_inst(inst,reg);
 	if (op == "sb")
-		sb_inst(inst);
+		sb_inst(inst,reg, memory);
 	if (op == "sh")
 		sh_inst(inst);
 	if (op == "sw")
 		sw_inst(inst, reg, memory);
 	if (op == "lb")
-		lb_inst(inst);
+		lb_inst(inst,reg, memory);
 	if (op == "lh")
 		lh_inst(inst);
 	if (op == "lw")
 		lw_inst(inst,reg, memory);
 	if (op == "lbu")
-		lbu_inst(inst);
+		lbu_inst(inst,reg,memory);
 	if (op == "lhu")
 		lhu_inst(inst);
 	if (op == "beq")
-		beq_inst(inst);
+		beq_inst(inst, reg, label, jump);
 	if (op == "bne")
 		bne_inst(inst);
 	if (op == "blt")
@@ -685,11 +701,11 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "jalr")
 		jalr_inst(inst);
 	if (op == "jal")
-		jal_inst(inst);
+		jal_inst(inst, reg, label, jump);
 	if (op == "lui")
 		lui_inst(inst);
 	if (op == "auipc")
-		auipc_inst(inst);
+		auipc_inst(inst,reg,jump);
 }
 
 
@@ -704,17 +720,31 @@ int main()
 	unordered_map<int, int> memory;
 	read_instruction(inst, lines, label);
 	read_initial(reg_init, memory_init, reg, memory);
+	int pc = 0;
+	while(pc!=(lines.size()*4))
+	{
+		//cout<<lines.at(j)<<endl;
+		int jump = pc;
+		operation_divider(lines.at(pc), reg, label, memory, jump);
+		if (jump == pc)
+			pc = pc + 4;
+		else
+			pc = jump;
+	}
+	cout << pc << endl;
+
 	for (auto x : lines)
 	{
 		//string op, label;
-		cout << x.first << " " << x.second << endl;
+		//cout << x.first << " " << x.second << endl;
 		//det_op(op, x.second);
-		operation_divider(x.second,reg,label,memory);
+		//operation_divider(x.second,reg,label,memory);
 		//cout << op << endl;
 	}
+	//cout << lines.size();
 	for (auto x : label)
 	{
-		cout << x.first << " " << x.second << endl;
+		//cout << x.first << " " << x.second << endl;
 	}
 
 	return 0;

@@ -9,12 +9,12 @@ add x10, x10, x25
 lw x9, 0(x10)
 bne x9, x24, Exit
 addi x22, x22, 1
-beq x0, x0, Loop
+beq x25, x21, Loop
 lui x7, 6
 auipc x8, 4
 jal x6, label
 jalr x7, 7(x5)
-beq x3, x2, label
+beq x25, x2, label
 bne x3, x2, label
 blt x3, x2, label
 bge x3, x2, label
@@ -23,7 +23,7 @@ bgeu x3, x2, label
 lb x10, 5(x8)
 lh x10, 5(x8)
 lw x10, 5(x8)
-lbu x10, 5(x8)
+label: lbu x10, 5(x7)
 lhu x10, 5(x8)
 sb x7, 10(x2)
 sh x7, 10(x2)
