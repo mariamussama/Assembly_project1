@@ -500,10 +500,12 @@ void sh_inst(string inst) // store halfword instruction
 	load_op(rs1, rs2, offset, inst, "sh");
 	cout << rs1 << " " << rs2 << " " << offset << endl;
 }
-void sw_inst(string inst) // store word instruction 
+void sw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store word instruction 
 {
 	string rs1, rs2; int offset;
 	load_op(rs1, rs2, offset, inst, "sw");
+	addr = offset + reg.at(rs1);
+	memory[addr]=reg.at(rs2);
 	cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 /////////////////////////////////
@@ -519,11 +521,13 @@ void lh_inst(string inst) //  load halfword instruction
 	load_op(rd, rs1, offset, inst, "lh");
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
-void lw_inst(string inst) // load word instruction 
+void lw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load word instruction 
 {
 	cout << "lw" << endl;
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lw");
+	addr = offset + reg.at(rs1);
+	reg[rd] = memory.at(addr);
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lbu_inst(string inst) // load byte unsigned instruction 
@@ -655,13 +659,13 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "sh")
 		sh_inst(inst);
 	if (op == "sw")
-		sw_inst(inst);
+		sw_inst(inst, reg, memory);
 	if (op == "lb")
 		lb_inst(inst);
 	if (op == "lh")
 		lh_inst(inst);
 	if (op == "lw")
-		lw_inst(inst);
+		lw_inst(inst,reg, memory);
 	if (op == "lbu")
 		lbu_inst(inst);
 	if (op == "lhu")
