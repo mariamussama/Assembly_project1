@@ -493,21 +493,23 @@ void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate in
 void sb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store byte instruction 
 {
 	string rs1, rs2; int offset;
-	load_op(rs1, rs2, offset, inst,"sb");
+	store_op(rs1, rs2, offset, inst,"sb");
 	int8_t temp = reg.at(rs1);
 	memory[reg.at(rs2) + offset] = temp;
 	cout << rs1 << " " << rs2 << " " << offset << endl;
 }
-void sh_inst(string inst) // store halfword instruction 
+void sh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store halfword instruction 
 {
 	string rs1, rs2; int offset;
-	load_op(rs1, rs2, offset, inst, "sh");
+	store_op(rs1, rs2, offset, inst, "sh");
+	int16_t temp = reg.at(rs1);
+	memory[reg.at(rs2) + offset] = temp;
 	cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store word instruction 
 {
 	string rs1, rs2; int offset;
-	load_op(rs1, rs2, offset, inst, "sw");
+	store_op(rs1, rs2, offset, inst, "sw");
 	addr = offset + reg.at(rs1);
 	memory[addr]=reg.at(rs2);
 	cout << rs1 << " " << rs2 << " " << offset << endl;
@@ -521,10 +523,12 @@ void lb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	reg[rd] = temp;
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
-void lh_inst(string inst) //  load halfword instruction 
+void lh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) //  load halfword instruction 
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lh");
+	int16_t temp = memory.at(reg.at(rs1) + offset);
+	reg[rd] = temp;
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load word instruction 
@@ -544,10 +548,12 @@ void lbu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, i
 	reg[rd] = temp;
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
-void lhu_inst(string inst) // load halfword unsigne instruction 
+void lhu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load halfword unsigne instruction 
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lhu");
+	int16_t temp = abs(memory.at(reg.at(rs1) + offset));
+	reg[rd] = temp;
 	cout << rd << " " << rs1 << " " << offset << endl;
 }
 /////////////////////////////////
@@ -573,28 +579,44 @@ void bne_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 	}
 	cout << rs1 << " " << rs2 << " " << label << endl;
 }
-void blt_inst(string inst) // branch if less than instruction(<)
+void blt_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if less than instruction(<)
 {
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "blt");
+	if (reg.at(rs1) < reg.at(rs2))
+	{
+		jump = label.at(lab);
+	}
 	cout << rs1 << " " << rs2 << " " << label << endl;
 }
-void bge_inst(string inst) // branch if greater than or equal instruction (>=)
+void bge_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if greater than or equal instruction (>=)
 {
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "bge");
+	if (reg.at(rs1) >= reg.at(rs2))
+	{
+		jump = label.at(lab);
+	}
 	cout << rs1 << " " << rs2 << " " << label << endl;
 }
-void bltu_inst(string inst) // branch if less than using unsigned numbers instruction
+void bltu_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if less than using unsigned numbers instruction
 {
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "bltu");
+	if (abs(reg.at(rs1)) < abs(reg.at(rs2)))
+	{
+		jump = label.at(lab);
+	}
 	cout << rs1 << " " << rs2 << " " << label << endl;
 }
-void bgeu_inst(string inst) //branch if greater than or equal using unsigned numbers instruction
+void bgeu_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) //branch if greater than or equal using unsigned numbers instruction
 {
 	string rs1, rs2, label;
 	branch_op(rs1, rs2, label, inst, "bgeu");
+	if (abs(reg.at(rs1)) >= abs(reg.at(rs2)))
+	{
+		jump = label.at(lab);
+	}
 	cout << rs1 << " " << rs2 << " " << label << endl;
 }
 /////////////////////////////////
@@ -682,31 +704,31 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "sb")
 		sb_inst(inst,reg, memory);
 	if (op == "sh")
-		sh_inst(inst);
+		sh_inst(inst, reg, memory);
 	if (op == "sw")
 		sw_inst(inst, reg, memory);
 	if (op == "lb")
 		lb_inst(inst,reg, memory);
 	if (op == "lh")
-		lh_inst(inst);
+		lh_inst(inst, reg, memory);
 	if (op == "lw")
 		lw_inst(inst,reg, memory);
 	if (op == "lbu")
-		lbu_inst(inst,reg,memory);
+		lbu_inst(inst,reg, memory);
 	if (op == "lhu")
-		lhu_inst(inst);
+		lhu_inst(inst, reg, memory);
 	if (op == "beq")
 		beq_inst(inst, reg, label, jump);
 	if (op == "bne")
 		bne_inst(inst, reg, label, jump);
 	if (op == "blt")
-		blt_inst(inst);
+		blt_inst(inst, reg, label, jump);
 	if (op == "bge")
-		bge_inst(inst);
+		bge_inst(inst, reg, label, jump);
 	if (op == "bltu")
-		bltu_inst(inst);
+		bltu_inst(inst, reg, label, jump);
 	if (op == "bgeu")
-		bgeu_inst(inst);
+		bgeu_inst(inst, reg, label, jump);
 	if (op == "jalr")
 		jalr_inst(inst, reg, jump);
 	if (op == "jal")
