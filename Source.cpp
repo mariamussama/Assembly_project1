@@ -394,7 +394,9 @@ void xor_inst(string inst, unordered_map<string, int>& reg) // exclusive or inst
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "xor", reg);
-	if (reg.at(rs1) == reg.at(rs2))
+	int rem1 = reg.at(rs1) % 2;
+	int rem2 = reg.at(rs2) % 2;
+	if (rem1 == rem2)
 		reg[rd] = 0;
 	else
 		reg[rd] = 1;
@@ -490,7 +492,9 @@ void xori_inst(string inst, unordered_map<string, int>& reg) // exclusive or imm
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "xori", reg);
-	if (reg.at(rs1) == val)
+	int rem1 = reg.at(rs1) % 2;
+	int rem2 = val % 2;
+	if (rem1 == rem2)
 		reg[rd] = 0;
 	else
 		reg[rd] = 1;
@@ -695,8 +699,8 @@ void lui_inst(string inst, unordered_map<string, int>& reg) // load upper immedi
 {
 	string rd; int val;
 	LUI_AUIPC(rd, val, inst, "lui", reg);
-	int16_t temp1 = val;
-	reg[rd] = temp1 * pow(2, 16);
+	int temp1 = val;
+	reg[rd] = temp1 * pow(2, 12);
 	/*
 	reg[rd] = pow(2,12)*val;
 	*/
@@ -820,7 +824,7 @@ void disp_init(unordered_map<int, int> memory, unordered_map<string, int> reg)
 int main()
 {
 	char hor = '-';           // Change to other characters if available
-	int tab = 18 * (3 + 1 + 4) + 1;
+	int tab = 20 * (3 + 1 + 4) + 1;
 
 	ifstream inst("instructions.txt");
 	ifstream reg_init("initialReg.txt");
