@@ -29,6 +29,7 @@ void det_label(string& label, string line)
 	string temp = "";
 	int i = 0;
 	label = temp;
+	if ((line != "fence") && (line != "ecall") && (line != "ebreak"))
 	while (line[i] != ' ')
 	{
 		if (line[i] == ':')
@@ -94,7 +95,7 @@ void read_initial(ifstream& reg, ifstream& memory, unordered_map<string, int>& R
 }
 
 //instruction divider to get the registers/ offsets/ labels....
-void three_reg(string& rd, string& rs1, string& rs2, string Inst, string op) //all instructions that deal with three registers
+void three_reg(string& rd, string& rs1, string& rs2, string Inst, string op, unordered_map<string, int>& R) //all instructions that deal with three registers
 {
 	vector<string>reg;
 	string temp;
@@ -121,9 +122,15 @@ void three_reg(string& rd, string& rs1, string& rs2, string Inst, string op) //a
 	rd = reg[0];
 	rs1 = reg[1];
 	rs2 = reg[2];
+	if (R.find(rd) == R.end())
+		R[rd] = 0;
+	if (R.find(rs1) == R.end())
+		R[rs1] = 0;
+	if (R.find(rs2) == R.end())
+		R[rs2] = 0;
 }
 
-void imm_op(string& rd, string& rs1, int& val, string Inst, string op) //immediate instructions
+void imm_op(string& rd, string& rs1, int& val, string Inst, string op, unordered_map<string, int>& R) //immediate instructions
 {
 	vector<string>reg;
 	string temp;
@@ -149,10 +156,14 @@ void imm_op(string& rd, string& rs1, int& val, string Inst, string op) //immedia
 	}
 	rd = reg[0];
 	rs1 = reg[1];
+	if (R.find(rd) == R.end())
+		R[rd] = 0;
+	if (R.find(rs1) == R.end())
+		R[rs1] = 0;
 	val = stoi(reg[2]);
 }
 
-void load_op(string& rd, string& rs1, int& offset, string Inst, string op) //load instructions 
+void load_op(string& rd, string& rs1, int& offset, string Inst, string op, unordered_map<string, int>& R) //load instructions 
 {
 	vector<string>reg;
 	string temp;
@@ -190,10 +201,14 @@ void load_op(string& rd, string& rs1, int& offset, string Inst, string op) //loa
 	}
 	rd = reg[0];
 	rs1 = reg[1];
+	if (R.find(rd) == R.end())
+		R[rd] = 0;
+	if (R.find(rs1) == R.end())
+		R[rs1] = 0;
 
 }
 
-void store_op(string& rs1, string& rs2, int& offset, string Inst, string op) //store instructions
+void store_op(string& rs1, string& rs2, int& offset, string Inst, string op, unordered_map<string, int>& R) //store instructions
 {
 	vector<string>reg;
 	string temp;
@@ -231,10 +246,14 @@ void store_op(string& rs1, string& rs2, int& offset, string Inst, string op) //s
 	}
 	rs1 = reg[0];
 	rs2 = reg[1];
+	if (R.find(rs1) == R.end())
+		R[rs1] = 0;
+	if (R.find(rs2) == R.end())
+		R[rs2] = 0;
 
 }
 
-void branch_op(string& rs1, string& rs2, string& label, string Inst, string op) //branching instructions
+void branch_op(string& rs1, string& rs2, string& label, string Inst, string op, unordered_map<string, int>& R) //branching instructions
 {
 	vector<string>reg;
 	string temp;
@@ -259,11 +278,15 @@ void branch_op(string& rs1, string& rs2, string& label, string Inst, string op) 
 		reg[index] = temp;
 	}
 	rs1 = reg[0];
+	if (R.find(rs1) == R.end())
+		R[rs1] = 0;
 	rs2 = reg[1];
+	if (R.find(rs2) == R.end())
+		R[rs2] = 0;
 	label = reg[2];
 }
 
-void Jal_op(string& rd, string& label, string Inst, string op) //jump and link instruction
+void Jal_op(string& rd, string& label, string Inst, string op, unordered_map<string, int>& R) //jump and link instruction
 {
 	vector<string>reg;
 	string temp;
@@ -288,10 +311,12 @@ void Jal_op(string& rd, string& label, string Inst, string op) //jump and link i
 		reg[index] = temp;
 	}
 	rd = reg[0];
+	if (R.find(rd) == R.end())
+		R[rd] = 0;
 	label = reg[1];
 }
 
-void LUI_AUIPC(string& rd, int& val, string Inst, string op) //LUI and AUIPC instructions
+void LUI_AUIPC(string& rd, int& val, string Inst, string op, unordered_map<string, int>& R) //LUI and AUIPC instructions
 {
 	vector<string>reg;
 	string temp;
@@ -316,6 +341,8 @@ void LUI_AUIPC(string& rd, int& val, string Inst, string op) //LUI and AUIPC ins
 		reg[index] = temp;
 	}
 	rd = reg[0];
+	if (R.find(rd) == R.end())
+		R[rd] = 0;
 	val = stoi(reg[1]);
 }
 
@@ -324,7 +351,7 @@ void add_inst(string inst, unordered_map<string, int>& reg) // addition instruct
 {
 	//cout << "add" << endl;
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "add");
+	three_reg(rd, rs1, rs2, inst, "add",reg);
 	reg[rd] = reg.at(rs1) + reg.at(rs2);
 	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
@@ -332,21 +359,21 @@ void sub_inst(string inst, unordered_map<string, int>& reg)  // subtraction inst
 {
 	//cout << "sub" << endl;
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "sub");
+	three_reg(rd, rs1, rs2, inst, "sub",reg);
 	reg[rd] = reg.at(rs1) - reg.at(rs2);
 	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sll_inst(string inst, unordered_map<string, int>& reg) // shift left logical instruction 
 {
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "sll");
+	three_reg(rd, rs1, rs2, inst, "sll",reg);
 	reg[rd] = reg.at(rs1) * pow(2, reg.at(rs2));
 	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void slt_inst(string inst, unordered_map<string, int>& reg) // set less than instruction
 {
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "slt");
+	three_reg(rd, rs1, rs2, inst, "slt",reg);
 	if (reg.at(rs1) < reg.at(rs2))
 		reg[rd] = 1;
 	else
@@ -356,7 +383,7 @@ void slt_inst(string inst, unordered_map<string, int>& reg) // set less than ins
 void sltu_inst(string inst, unordered_map<string, int>& reg) // set less than unsigned instruction
 {
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "sltu");
+	three_reg(rd, rs1, rs2, inst, "sltu",reg);
 	if (abs(reg.at(rs1)) < abs(reg.at(rs2)))
 		reg[rd] = 1;
 	else
@@ -366,7 +393,7 @@ void sltu_inst(string inst, unordered_map<string, int>& reg) // set less than un
 void xor_inst(string inst, unordered_map<string, int>& reg) // exclusive or instruction 
 {
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "xor");
+	three_reg(rd, rs1, rs2, inst, "xor", reg);
 	if (reg.at(rs1) == reg.at(rs2))
 		reg[rd] = 0;
 	else
@@ -376,21 +403,21 @@ void xor_inst(string inst, unordered_map<string, int>& reg) // exclusive or inst
 void srl_inst(string inst, unordered_map<string, int>& reg) // shift right logical instruction
 {
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "srl");
+	three_reg(rd, rs1, rs2, inst, "srl", reg);
 	reg[rd] = reg.at(rs1) / (pow(2, reg.at(rs2)));
 	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sra_inst(string inst, unordered_map<string, int>& reg) // shift right arithmetic instruction 
 {
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "sra");
+	three_reg(rd, rs1, rs2, inst, "sra", reg);
 	reg[rd] = reg.at(rs1) / pow(2, reg.at(rs2));
 	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void or_inst(string inst, unordered_map<string, int>& reg) // or instruction
 {
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "or");
+	three_reg(rd, rs1, rs2, inst, "or", reg);
 	if (reg.at(rs1) || reg.at(rs2))
 		reg[rd] = 1;
 	else
@@ -401,7 +428,7 @@ void and_inst(string inst, unordered_map<string, int>& reg) // and instruction
 {
 	//cout << "and" << endl;
 	string rd, rs1, rs2;
-	three_reg(rd, rs1, rs2, inst, "and");
+	three_reg(rd, rs1, rs2, inst, "and", reg);
 	if (reg.at(rs1) && reg.at(rs2))
 		reg[rd] = 1;
 	else
@@ -412,21 +439,21 @@ void and_inst(string inst, unordered_map<string, int>& reg) // and instruction
 void slli_inst(string inst, unordered_map<string, int>& reg) // shift left logical immediate instruction  
 {
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "slli");
+	imm_op(rd, rs1, val, inst, "slli",reg);
 	reg[rd] = reg.at(rs1) * pow(2, val);
 	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void srli_inst(string inst, unordered_map<string, int>& reg) // shift right logical immediate instrucrtion 
 {
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "srli");
+	imm_op(rd, rs1, val, inst, "srli",reg);
 	reg[rd] = reg.at(rs1) / (pow(2, val));
 	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void srai_inst(string inst, unordered_map<string, int>& reg) // shift right arethmetic immediate instruction 
 {
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "srai");
+	imm_op(rd, rs1, val, inst, "srai",reg);
 	reg[rd] = reg.at(rs1) / pow(2, val);
 	//cout << rd << " " << rs1 << " " << val << endl;
 }
@@ -435,14 +462,14 @@ void addi_inst(string inst, unordered_map<string, int>& reg) // add immediate in
 {
 	//cout << "addi" << endl;
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "addi");
+	imm_op(rd, rs1, val, inst, "addi", reg);
 	reg[rd] = reg.at(rs1) + val;
 	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void slti_inst(string inst, unordered_map<string, int>& reg) // set if less than immediate instruction 
 {
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "slti");
+	imm_op(rd, rs1, val, inst, "slti", reg);
 	if (reg.at(rs1) < val)
 		reg[rd] = 1;
 	else
@@ -452,7 +479,7 @@ void slti_inst(string inst, unordered_map<string, int>& reg) // set if less than
 void sltiu_inst(string inst, unordered_map<string, int>& reg) // set if less than unsigned immediate instruction 
 {
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "sltiu");
+	imm_op(rd, rs1, val, inst, "sltiu", reg);
 	if (abs(reg.at(rs1)) < abs(val))
 		reg[rd] = 1;
 	else
@@ -462,7 +489,7 @@ void sltiu_inst(string inst, unordered_map<string, int>& reg) // set if less tha
 void xori_inst(string inst, unordered_map<string, int>& reg) // exclusive or immediate instruction 
 {
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "xori");
+	imm_op(rd, rs1, val, inst, "xori", reg);
 	if (reg.at(rs1) == val)
 		reg[rd] = 0;
 	else
@@ -472,7 +499,7 @@ void xori_inst(string inst, unordered_map<string, int>& reg) // exclusive or imm
 void ori_inst(string inst, unordered_map<string, int>& reg) // or immediate instruction 
 {
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "ori");
+	imm_op(rd, rs1, val, inst, "ori", reg);
 	if (reg.at(rs1) || val)
 		reg[rd] = 1;
 	else
@@ -482,7 +509,7 @@ void ori_inst(string inst, unordered_map<string, int>& reg) // or immediate inst
 void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate instruction 
 {
 	string rd, rs1; int val;
-	imm_op(rd, rs1, val, inst, "andi");
+	imm_op(rd, rs1, val, inst, "andi", reg);
 	if (reg.at(rs1) && val)
 		reg[rd] = 1;
 	else
@@ -493,41 +520,56 @@ void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate in
 void sb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store byte instruction 
 {
 	string rs1, rs2; int offset;
-	store_op(rs1, rs2, offset, inst, "sb");
+	store_op(rs1, rs2, offset, inst, "sb",reg);
 	int8_t temp = reg.at(rs1);
-	memory[reg.at(rs2) + offset] = temp;
+	int addr = reg.at(rs2) + offset;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	memory[addr] = temp;
 	//cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store halfword instruction 
 {
 	string rs1, rs2; int offset;
-	store_op(rs1, rs2, offset, inst, "sh");
+	store_op(rs1, rs2, offset, inst, "sh",reg);
 	int16_t temp = reg.at(rs1);
-	memory[reg.at(rs2) + offset] = temp;
+	int addr = reg.at(rs2) + offset;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	memory[addr] = temp;
 	//cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store word instruction 
 {
 	string rs1, rs2; int offset;
-	store_op(rs1, rs2, offset, inst, "sw");
-	int addr = offset + reg.at(rs1);
-	memory[addr] = reg.at(rs2);
+	store_op(rs1, rs2, offset, inst, "sw",reg);
+	int32_t temp = reg.at(rs1);
+	int addr = reg.at(rs2) + offset;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	memory[addr] = temp;
 	//cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 /////////////////////////////////
 void lb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) //  load byte instruction 
 {
 	string rd, rs1; int offset;
-	load_op(rd, rs1, offset, inst, "lb");
-	int8_t temp = memory.at(reg.at(rs1) + offset);
+	load_op(rd, rs1, offset, inst, "lb",reg);
+	int addr = reg.at(rs1) + offset;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	int8_t temp = memory.at(addr);
 	reg[rd] = temp;
 	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) //  load halfword instruction 
 {
 	string rd, rs1; int offset;
-	load_op(rd, rs1, offset, inst, "lh");
-	int16_t temp = memory.at(reg.at(rs1) + offset);
+	load_op(rd, rs1, offset, inst, "lh",reg);
+	int addr = reg.at(rs1) + offset;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	int16_t temp = memory.at(addr);
 	reg[rd] = temp;
 	//cout << rd << " " << rs1 << " " << offset << endl;
 }
@@ -535,24 +577,33 @@ void lw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 {
 	//cout << "lw" << endl;
 	string rd, rs1; int offset;
-	load_op(rd, rs1, offset, inst, "lw");
-	int32_t addr = memory.at(offset + reg.at(rs1));
-	reg[rd] = addr;
+	load_op(rd, rs1, offset, inst, "lw",reg);
+	int addr = reg.at(rs1) + offset;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	int32_t temp = memory.at(addr);
+	reg[rd] = temp;
 	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lbu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load byte unsigned instruction 
 {
 	string rd, rs1; int offset;
-	load_op(rd, rs1, offset, inst, "lbu");
-	int8_t temp = abs(memory.at(reg.at(rs1) + offset));
+	load_op(rd, rs1, offset, inst, "lbu",reg);
+	int addr = reg.at(rs1) + offset;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	int8_t temp = abs(memory.at(addr));
 	reg[rd] = temp;
 	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lhu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load halfword unsigne instruction 
 {
 	string rd, rs1; int offset;
-	load_op(rd, rs1, offset, inst, "lhu");
-	int16_t temp = abs(memory.at(reg.at(rs1) + offset));
+	load_op(rd, rs1, offset, inst, "lhu",reg);
+	int addr = reg.at(rs1) + offset;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	int16_t temp = abs(memory.at(addr));
 	reg[rd] = temp;
 	//cout << rd << " " << rs1 << " " << offset << endl;
 }
@@ -561,7 +612,7 @@ void beq_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 {
 	//cout << "beq" << endl;
 	string rs1, rs2, lab;
-	branch_op(rs1, rs2, lab, inst, "beq");
+	branch_op(rs1, rs2, lab, inst, "beq", reg);
 	if (reg.at(rs1) == reg.at(rs2))
 	{
 		jump = label.at(lab);
@@ -572,7 +623,7 @@ void bne_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 {
 	//cout << "bne" << endl;
 	string rs1, rs2, lab;
-	branch_op(rs1, rs2, lab, inst, "bne");
+	branch_op(rs1, rs2, lab, inst, "bne", reg);
 	if (reg.at(rs1) != reg.at(rs2))
 	{
 		jump = label.at(lab);
@@ -582,7 +633,7 @@ void bne_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 void blt_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if less than instruction(<)
 {
 	string rs1, rs2, lab;
-	branch_op(rs1, rs2, lab, inst, "blt");
+	branch_op(rs1, rs2, lab, inst, "blt", reg);
 	if (reg.at(rs1) < reg.at(rs2))
 	{
 		jump = label.at(lab);
@@ -592,7 +643,7 @@ void blt_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 void bge_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if greater than or equal instruction (>=)
 {
 	string rs1, rs2, lab;
-	branch_op(rs1, rs2, lab, inst, "bge");
+	branch_op(rs1, rs2, lab, inst, "bge", reg);
 	if (reg.at(rs1) >= reg.at(rs2))
 	{
 		jump = label.at(lab);
@@ -602,7 +653,7 @@ void bge_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 void bltu_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if less than using unsigned numbers instruction
 {
 	string rs1, rs2, lab;
-	branch_op(rs1, rs2, lab, inst, "bltu");
+	branch_op(rs1, rs2, lab, inst, "bltu", reg);
 	if (abs(reg.at(rs1)) < abs(reg.at(rs2)))
 	{
 		jump = label.at(lab);
@@ -612,7 +663,7 @@ void bltu_inst(string inst, unordered_map<string, int>& reg, unordered_map<strin
 void bgeu_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) //branch if greater than or equal using unsigned numbers instruction
 {
 	string rs1, rs2, lab;
-	branch_op(rs1, rs2, lab, inst, "bgeu");
+	branch_op(rs1, rs2, lab, inst, "bgeu", reg);
 	if (abs(reg.at(rs1)) >= abs(reg.at(rs2)))
 	{
 		jump = label.at(lab);
@@ -623,7 +674,7 @@ void bgeu_inst(string inst, unordered_map<string, int>& reg, unordered_map<strin
 void jalr_inst(string inst, unordered_map<string, int>& reg, int& jump) // jump and link register instruction 
 {
 	string rd, rs1; int offset;
-	load_op(rd, rs1, offset, inst, "jalr");
+	load_op(rd, rs1, offset, inst, "jalr", reg);
 	reg[rd] = jump + 4;
 	jump = reg.at(rs1) + offset;
 
@@ -633,7 +684,7 @@ void jalr_inst(string inst, unordered_map<string, int>& reg, int& jump) // jump 
 void jal_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // jump and link instruction 
 {
 	string rd, lab;
-	Jal_op(rd, lab, inst, "jal");
+	Jal_op(rd, lab, inst, "jal", reg);
 	reg[rd] = jump + 4;
 	jump = label.at(lab);
 	//cout << "jump" << endl << endl;
@@ -643,16 +694,19 @@ void jal_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 void lui_inst(string inst, unordered_map<string, int>& reg) // load upper immediate instruction 
 {
 	string rd; int val;
-	LUI_AUIPC(rd, val, inst, "lui");
+	LUI_AUIPC(rd, val, inst, "lui", reg);
 	int16_t temp1 = val;
 	reg[rd] = temp1 * pow(2, 16);
+	/*
+	reg[rd] = pow(2,12)*val;
+	*/
 	//cout << rd << " " << val << endl;
 }
 void auipc_inst(string inst, unordered_map<string, int>& reg, int& jump) // add upper immediate to PC instruction 
 {
 	string rd; int val;
-	LUI_AUIPC(rd, val, inst, "auipc");
-	reg[rd] = jump + val;
+	LUI_AUIPC(rd, val, inst, "auipc", reg);
+	reg[rd] = jump + (pow(2,12)*val);
 	//cout << rd << " " << val << endl;
 }
 /////////////////////////////////
@@ -661,84 +715,88 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 {
 	int output;
 	string op;
-	det_op(op, inst);
-	//cout << op << endl;
-	if (op == "add")
-		add_inst(inst, reg);
-	if (op == "sub")
-		sub_inst(inst, reg);
-	if (op == "sll")
-		sll_inst(inst, reg);
-	if (op == "slt")
-		slt_inst(inst, reg);
-	if (op == "sltu")
-		sltu_inst(inst, reg);
-	if (op == "xor")
-		xor_inst(inst, reg);
-	if (op == "srl")
-		srl_inst(inst, reg);
-	if (op == "sra")
-		sra_inst(inst, reg);
-	if (op == "or")
-		or_inst(inst, reg);
-	if (op == "and")
-		and_inst(inst, reg);
-	if (op == "slli")
-		slli_inst(inst, reg);
-	if (op == "srli")
-		srli_inst(inst, reg);
-	if (op == "srai")
-		srai_inst(inst, reg);
-	if (op == "addi")
-		addi_inst(inst, reg);
-	if (op == "slti")
-		slti_inst(inst, reg);
-	if (op == "sltiu")
-		sltiu_inst(inst, reg);
-	if (op == "xori")
-		xori_inst(inst, reg);
-	if (op == "ori")
-		ori_inst(inst, reg);
-	if (op == "andi")
-		andi_inst(inst, reg);
-	if (op == "sb")
-		sb_inst(inst, reg, memory);
-	if (op == "sh")
-		sh_inst(inst, reg, memory);
-	if (op == "sw")
-		sw_inst(inst, reg, memory);
-	if (op == "lb")
-		lb_inst(inst, reg, memory);
-	if (op == "lh")
-		lh_inst(inst, reg, memory);
-	if (op == "lw")
-		lw_inst(inst, reg, memory);
-	if (op == "lbu")
-		lbu_inst(inst, reg, memory);
-	if (op == "lhu")
-		lhu_inst(inst, reg, memory);
-	if (op == "beq")
-		beq_inst(inst, reg, label, jump);
-	if (op == "bne")
-		bne_inst(inst, reg, label, jump);
-	if (op == "blt")
-		blt_inst(inst, reg, label, jump);
-	if (op == "bge")
-		bge_inst(inst, reg, label, jump);
-	if (op == "bltu")
-		bltu_inst(inst, reg, label, jump);
-	if (op == "bgeu")
-		bgeu_inst(inst, reg, label, jump);
-	if (op == "jalr")
-		jalr_inst(inst, reg, jump);
-	if (op == "jal")
-		jal_inst(inst, reg, label, jump);
-	if (op == "lui")
-		lui_inst(inst, reg);
-	if (op == "auipc")
-		auipc_inst(inst, reg, jump);
-	if ((op == "fence") || (op == "ecall") || (op == "ebreak"))
+	if ((inst == "fence") || (inst == "ecall") || (inst == "ebreak"))
 		jump = (lines.size() * 4);
+	else 
+	{
+		det_op(op, inst);
+		//cout << op << endl;
+		if (op == "add")
+			add_inst(inst, reg);
+		if (op == "sub")
+			sub_inst(inst, reg);
+		if (op == "sll")
+			sll_inst(inst, reg);
+		if (op == "slt")
+			slt_inst(inst, reg);
+		if (op == "sltu")
+			sltu_inst(inst, reg);
+		if (op == "xor")
+			xor_inst(inst, reg);
+		if (op == "srl")
+			srl_inst(inst, reg);
+		if (op == "sra")
+			sra_inst(inst, reg);
+		if (op == "or")
+			or_inst(inst, reg);
+		if (op == "and")
+			and_inst(inst, reg);
+		if (op == "slli")
+			slli_inst(inst, reg);
+		if (op == "srli")
+			srli_inst(inst, reg);
+		if (op == "srai")
+			srai_inst(inst, reg);
+		if (op == "addi")
+			addi_inst(inst, reg);
+		if (op == "slti")
+			slti_inst(inst, reg);
+		if (op == "sltiu")
+			sltiu_inst(inst, reg);
+		if (op == "xori")
+			xori_inst(inst, reg);
+		if (op == "ori")
+			ori_inst(inst, reg);
+		if (op == "andi")
+			andi_inst(inst, reg);
+		if (op == "sb")
+			sb_inst(inst, reg, memory);
+		if (op == "sh")
+			sh_inst(inst, reg, memory);
+		if (op == "sw")
+			sw_inst(inst, reg, memory);
+		if (op == "lb")
+			lb_inst(inst, reg, memory);
+		if (op == "lh")
+			lh_inst(inst, reg, memory);
+		if (op == "lw")
+			lw_inst(inst, reg, memory);
+		if (op == "lbu")
+			lbu_inst(inst, reg, memory);
+		if (op == "lhu")
+			lhu_inst(inst, reg, memory);
+		if (op == "beq")
+			beq_inst(inst, reg, label, jump);
+		if (op == "bne")
+			bne_inst(inst, reg, label, jump);
+		if (op == "blt")
+			blt_inst(inst, reg, label, jump);
+		if (op == "bge")
+			bge_inst(inst, reg, label, jump);
+		if (op == "bltu")
+			bltu_inst(inst, reg, label, jump);
+		if (op == "bgeu")
+			bgeu_inst(inst, reg, label, jump);
+		if (op == "jalr")
+			jalr_inst(inst, reg, jump);
+		if (op == "jal")
+			jal_inst(inst, reg, label, jump);
+		if (op == "lui")
+			lui_inst(inst, reg);
+		if (op == "auipc")
+			auipc_inst(inst, reg, jump);
+	}
+	
 }
 
 void disp_init(unordered_map<int, int> memory, unordered_map<string, int> reg)
@@ -794,7 +852,7 @@ int main()
 	}
 	//cout << pc << endl;
 
-	for (auto x : lines)
+	/*for (auto x : lines)
 	{
 		//string op, label;
 		//cout << x.first << " " << x.second << endl;
@@ -807,6 +865,10 @@ int main()
 	{
 		//cout << x.first << " " << x.second << endl;
 	}
+	for (auto x : reg)
+	{
+		//cout << x.first << " " << x.second << endl;
+	}*/
 
 	return 0;
 }

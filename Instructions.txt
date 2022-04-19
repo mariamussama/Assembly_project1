@@ -26,7 +26,6 @@ label: lbu x10, 4(x7)
 lhu x10, 9(x5)
 sb x7, 10(x2)
 sh x7, 10(x2)
-sw x7, 10(x2)
 addi x1, x2, 4
 slti x1, x2, 4
 sltiu x1, x2, 4
@@ -41,7 +40,9 @@ add x1, x2, x3
 sub x1, x2, x3
 sll x1, x2, x3
 slt x1, x2, x3
+sw x7, 10(x2)
 sltu x1, x2, x3
+ebreak
 xor x1, x2, x3
 srl x1, x2, x3
 sra x1, x2, x3
