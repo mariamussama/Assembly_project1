@@ -14,7 +14,7 @@ void det_op(string& operation, string line) //extract label and operation
 	{
 		if (line[i] == ':')
 		{
-			Temp = ""; 
+			Temp = "";
 			i++;
 		}
 		else
@@ -44,7 +44,7 @@ void det_label(string& label, string line)
 //read instructions and save them in the corresponding unordered map(lines) and labels
 void read_instruction(ifstream& file, unordered_map<int, string>& lines, unordered_map<string, int>& label)
 {
-	string inst,lab="";
+	string inst, lab = "";
 	if (!file.is_open())
 		cout << "Can't open file" << endl;
 	else
@@ -54,11 +54,11 @@ void read_instruction(ifstream& file, unordered_map<int, string>& lines, unorder
 		{
 			lines[i] = inst;
 			det_label(lab, inst);
-			if (lab!="")
+			if (lab != "")
 				label[lab] = i;//save labels and their corresponding instruction no.
 			i = i + 4;
 		}
-		
+
 	}
 	//for (auto x : lines)
 		//cout << x.first << " " << x.second << endl;
@@ -322,26 +322,26 @@ void LUI_AUIPC(string& rd, int& val, string Inst, string op) //LUI and AUIPC ins
 //the operations fuunctions
 void add_inst(string inst, unordered_map<string, int>& reg) // addition instruction 
 {
-	cout << "add" << endl;
+	//cout << "add" << endl;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "add");
-	reg[rd] = reg.at(rs1)+ reg.at(rs2);
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	reg[rd] = reg.at(rs1) + reg.at(rs2);
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sub_inst(string inst, unordered_map<string, int>& reg)  // subtraction instruction
 {
-	cout << "sub" << endl;
+	//cout << "sub" << endl;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sub");
 	reg[rd] = reg.at(rs1) - reg.at(rs2);
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sll_inst(string inst, unordered_map<string, int>& reg) // shift left logical instruction 
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sll");
 	reg[rd] = reg.at(rs1) * pow(2, reg.at(rs2));
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void slt_inst(string inst, unordered_map<string, int>& reg) // set less than instruction
 {
@@ -351,7 +351,7 @@ void slt_inst(string inst, unordered_map<string, int>& reg) // set less than ins
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sltu_inst(string inst, unordered_map<string, int>& reg) // set less than unsigned instruction
 {
@@ -361,7 +361,7 @@ void sltu_inst(string inst, unordered_map<string, int>& reg) // set less than un
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void xor_inst(string inst, unordered_map<string, int>& reg) // exclusive or instruction 
 {
@@ -371,21 +371,21 @@ void xor_inst(string inst, unordered_map<string, int>& reg) // exclusive or inst
 		reg[rd] = 0;
 	else
 		reg[rd] = 1;
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void srl_inst(string inst, unordered_map<string, int>& reg) // shift right logical instruction
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "srl");
-	reg[rd] = reg.at(rs1)/(pow(2,reg.at(rs2)));
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	reg[rd] = reg.at(rs1) / (pow(2, reg.at(rs2)));
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void sra_inst(string inst, unordered_map<string, int>& reg) // shift right arithmetic instruction 
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "sra");
 	reg[rd] = reg.at(rs1) / pow(2, reg.at(rs2));
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void or_inst(string inst, unordered_map<string, int>& reg) // or instruction
 {
@@ -395,18 +395,18 @@ void or_inst(string inst, unordered_map<string, int>& reg) // or instruction
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void and_inst(string inst, unordered_map<string, int>& reg) // and instruction 
 {
-	cout << "and" << endl;
+	//cout << "and" << endl;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "and");
 	if (reg.at(rs1) && reg.at(rs2))
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
-	cout << rd << " " << rs1 << " " << rs2 << endl;
+	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 /////////////////////////////////
 void slli_inst(string inst, unordered_map<string, int>& reg) // shift left logical immediate instruction  
@@ -414,30 +414,30 @@ void slli_inst(string inst, unordered_map<string, int>& reg) // shift left logic
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "slli");
 	reg[rd] = reg.at(rs1) * pow(2, val);
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void srli_inst(string inst, unordered_map<string, int>& reg) // shift right logical immediate instrucrtion 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "srli");
 	reg[rd] = reg.at(rs1) / (pow(2, val));
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void srai_inst(string inst, unordered_map<string, int>& reg) // shift right arethmetic immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "srai");
 	reg[rd] = reg.at(rs1) / pow(2, val);
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 /////////////////////////////////
 void addi_inst(string inst, unordered_map<string, int>& reg) // add immediate instruction 
 {
-	cout << "addi" << endl;
+	//cout << "addi" << endl;
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "addi");
 	reg[rd] = reg.at(rs1) + val;
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void slti_inst(string inst, unordered_map<string, int>& reg) // set if less than immediate instruction 
 {
@@ -447,7 +447,7 @@ void slti_inst(string inst, unordered_map<string, int>& reg) // set if less than
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void sltiu_inst(string inst, unordered_map<string, int>& reg) // set if less than unsigned immediate instruction 
 {
@@ -457,7 +457,7 @@ void sltiu_inst(string inst, unordered_map<string, int>& reg) // set if less tha
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void xori_inst(string inst, unordered_map<string, int>& reg) // exclusive or immediate instruction 
 {
@@ -467,7 +467,7 @@ void xori_inst(string inst, unordered_map<string, int>& reg) // exclusive or imm
 		reg[rd] = 0;
 	else
 		reg[rd] = 1;
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void ori_inst(string inst, unordered_map<string, int>& reg) // or immediate instruction 
 {
@@ -477,7 +477,7 @@ void ori_inst(string inst, unordered_map<string, int>& reg) // or immediate inst
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate instruction 
 {
@@ -487,16 +487,16 @@ void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate in
 		reg[rd] = 1;
 	else
 		reg[rd] = 0;
-	cout << rd << " " << rs1 << " " << val << endl;
+	//cout << rd << " " << rs1 << " " << val << endl;
 }
 /////////////////////////////////
 void sb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store byte instruction 
 {
 	string rs1, rs2; int offset;
-	store_op(rs1, rs2, offset, inst,"sb");
+	store_op(rs1, rs2, offset, inst, "sb");
 	int8_t temp = reg.at(rs1);
 	memory[reg.at(rs2) + offset] = temp;
-	cout << rs1 << " " << rs2 << " " << offset << endl;
+	//cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store halfword instruction 
 {
@@ -504,15 +504,15 @@ void sh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	store_op(rs1, rs2, offset, inst, "sh");
 	int16_t temp = reg.at(rs1);
 	memory[reg.at(rs2) + offset] = temp;
-	cout << rs1 << " " << rs2 << " " << offset << endl;
+	//cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store word instruction 
 {
 	string rs1, rs2; int offset;
 	store_op(rs1, rs2, offset, inst, "sw");
-	addr = offset + reg.at(rs1);
-	memory[addr]=reg.at(rs2);
-	cout << rs1 << " " << rs2 << " " << offset << endl;
+	int addr = offset + reg.at(rs1);
+	memory[addr] = reg.at(rs2);
+	//cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 /////////////////////////////////
 void lb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) //  load byte instruction 
@@ -521,7 +521,7 @@ void lb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	load_op(rd, rs1, offset, inst, "lb");
 	int8_t temp = memory.at(reg.at(rs1) + offset);
 	reg[rd] = temp;
-	cout << rd << " " << rs1 << " " << offset << endl;
+	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) //  load halfword instruction 
 {
@@ -529,24 +529,24 @@ void lh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	load_op(rd, rs1, offset, inst, "lh");
 	int16_t temp = memory.at(reg.at(rs1) + offset);
 	reg[rd] = temp;
-	cout << rd << " " << rs1 << " " << offset << endl;
+	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load word instruction 
 {
-	cout << "lw" << endl;
+	//cout << "lw" << endl;
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lw");
-	addr = offset + reg.at(rs1);
-	reg[rd] = memory.at(addr);
-	cout << rd << " " << rs1 << " " << offset << endl;
+	int32_t addr = memory.at(offset + reg.at(rs1));
+	reg[rd] = addr;
+	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lbu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load byte unsigned instruction 
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lbu");
-	int8_t temp =abs(memory.at(reg.at(rs1) + offset));
+	int8_t temp = abs(memory.at(reg.at(rs1) + offset));
 	reg[rd] = temp;
-	cout << rd << " " << rs1 << " " << offset << endl;
+	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lhu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load halfword unsigne instruction 
 {
@@ -554,70 +554,70 @@ void lhu_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, i
 	load_op(rd, rs1, offset, inst, "lhu");
 	int16_t temp = abs(memory.at(reg.at(rs1) + offset));
 	reg[rd] = temp;
-	cout << rd << " " << rs1 << " " << offset << endl;
+	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 /////////////////////////////////
 void beq_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if equal instruction (==)
 {
-	cout << "beq" << endl;
+	//cout << "beq" << endl;
 	string rs1, rs2, lab;
 	branch_op(rs1, rs2, lab, inst, "beq");
 	if (reg.at(rs1) == reg.at(rs2))
 	{
 		jump = label.at(lab);
 	}
-	cout << rs1 << " " << rs2 << " " << lab << endl;
+	//cout << rs1 << " " << rs2 << " " << lab << endl;
 }
 void bne_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if not equal instruction (!=)
 {
-	cout << "bne" << endl;
-	string rs1, rs2, label;
-	branch_op(rs1, rs2, label, inst, "bne");
+	//cout << "bne" << endl;
+	string rs1, rs2, lab;
+	branch_op(rs1, rs2, lab, inst, "bne");
 	if (reg.at(rs1) != reg.at(rs2))
 	{
 		jump = label.at(lab);
 	}
-	cout << rs1 << " " << rs2 << " " << label << endl;
+	//cout << rs1 << " " << rs2 << " " << lab << endl;
 }
 void blt_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if less than instruction(<)
 {
-	string rs1, rs2, label;
-	branch_op(rs1, rs2, label, inst, "blt");
+	string rs1, rs2, lab;
+	branch_op(rs1, rs2, lab, inst, "blt");
 	if (reg.at(rs1) < reg.at(rs2))
 	{
 		jump = label.at(lab);
 	}
-	cout << rs1 << " " << rs2 << " " << label << endl;
+	//cout << rs1 << " " << rs2 << " " << lab << endl;
 }
 void bge_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if greater than or equal instruction (>=)
 {
-	string rs1, rs2, label;
-	branch_op(rs1, rs2, label, inst, "bge");
+	string rs1, rs2, lab;
+	branch_op(rs1, rs2, lab, inst, "bge");
 	if (reg.at(rs1) >= reg.at(rs2))
 	{
 		jump = label.at(lab);
 	}
-	cout << rs1 << " " << rs2 << " " << label << endl;
+	//cout << rs1 << " " << rs2 << " " << lab << endl;
 }
 void bltu_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // branch if less than using unsigned numbers instruction
 {
-	string rs1, rs2, label;
-	branch_op(rs1, rs2, label, inst, "bltu");
+	string rs1, rs2, lab;
+	branch_op(rs1, rs2, lab, inst, "bltu");
 	if (abs(reg.at(rs1)) < abs(reg.at(rs2)))
 	{
 		jump = label.at(lab);
 	}
-	cout << rs1 << " " << rs2 << " " << label << endl;
+	//cout << rs1 << " " << rs2 << " " << lab << endl;
 }
 void bgeu_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) //branch if greater than or equal using unsigned numbers instruction
 {
-	string rs1, rs2, label;
-	branch_op(rs1, rs2, label, inst, "bgeu");
+	string rs1, rs2, lab;
+	branch_op(rs1, rs2, lab, inst, "bgeu");
 	if (abs(reg.at(rs1)) >= abs(reg.at(rs2)))
 	{
 		jump = label.at(lab);
 	}
-	cout << rs1 << " " << rs2 << " " << label << endl;
+	//cout << rs1 << " " << rs2 << " " << lab << endl;
 }
 /////////////////////////////////
 void jalr_inst(string inst, unordered_map<string, int>& reg, int& jump) // jump and link register instruction 
@@ -626,18 +626,18 @@ void jalr_inst(string inst, unordered_map<string, int>& reg, int& jump) // jump 
 	load_op(rd, rs1, offset, inst, "jalr");
 	reg[rd] = jump + 4;
 	jump = reg.at(rs1) + offset;
-	
-	cout << rd << " " << rs1 << " " << offset << endl;
+
+	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 /////////////////////////////////
-void jal_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int &jump) // jump and link instruction 
+void jal_inst(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, int& jump) // jump and link instruction 
 {
 	string rd, lab;
 	Jal_op(rd, lab, inst, "jal");
 	reg[rd] = jump + 4;
 	jump = label.at(lab);
-	cout << "jump" << endl << endl;
-	cout << rd << " " << lab << endl;
+	//cout << "jump" << endl << endl;
+	//cout << rd << " " << lab << endl;
 }
 /////////////////////////////////
 void lui_inst(string inst, unordered_map<string, int>& reg) // load upper immediate instruction 
@@ -646,75 +646,75 @@ void lui_inst(string inst, unordered_map<string, int>& reg) // load upper immedi
 	LUI_AUIPC(rd, val, inst, "lui");
 	int16_t temp1 = val;
 	reg[rd] = temp1 * pow(2, 16);
-	cout << rd << " " << val << endl;
+	//cout << rd << " " << val << endl;
 }
 void auipc_inst(string inst, unordered_map<string, int>& reg, int& jump) // add upper immediate to PC instruction 
 {
 	string rd; int val;
 	LUI_AUIPC(rd, val, inst, "auipc");
 	reg[rd] = jump + val;
-	cout << rd << " " << val << endl;
+	//cout << rd << " " << val << endl;
 }
 /////////////////////////////////
 //divider function that call the operation function based on the operation
-void operation_divider(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, unordered_map<int, int>& memory, int &jump) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
+void operation_divider(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, unordered_map<int, int>& memory, int& jump, unordered_map<int, string> lines) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
 {
 	int output;
 	string op;
 	det_op(op, inst);
 	//cout << op << endl;
 	if (op == "add")
-		add_inst(inst,reg);
+		add_inst(inst, reg);
 	if (op == "sub")
-		sub_inst(inst,reg);
+		sub_inst(inst, reg);
 	if (op == "sll")
-		sll_inst(inst,reg);
+		sll_inst(inst, reg);
 	if (op == "slt")
-		slt_inst(inst,reg);
+		slt_inst(inst, reg);
 	if (op == "sltu")
-		sltu_inst(inst,reg);
+		sltu_inst(inst, reg);
 	if (op == "xor")
 		xor_inst(inst, reg);
 	if (op == "srl")
-		srl_inst(inst,reg);
+		srl_inst(inst, reg);
 	if (op == "sra")
 		sra_inst(inst, reg);
 	if (op == "or")
 		or_inst(inst, reg);
 	if (op == "and")
-		and_inst(inst,reg);
+		and_inst(inst, reg);
 	if (op == "slli")
 		slli_inst(inst, reg);
 	if (op == "srli")
-		srli_inst(inst,reg);
+		srli_inst(inst, reg);
 	if (op == "srai")
-		srai_inst(inst,reg);
+		srai_inst(inst, reg);
 	if (op == "addi")
-		addi_inst(inst,reg);
+		addi_inst(inst, reg);
 	if (op == "slti")
-		slti_inst(inst,reg);
+		slti_inst(inst, reg);
 	if (op == "sltiu")
-		sltiu_inst(inst,reg);
+		sltiu_inst(inst, reg);
 	if (op == "xori")
-		xori_inst(inst,reg);
+		xori_inst(inst, reg);
 	if (op == "ori")
-		ori_inst(inst,reg);
+		ori_inst(inst, reg);
 	if (op == "andi")
-		andi_inst(inst,reg);
+		andi_inst(inst, reg);
 	if (op == "sb")
-		sb_inst(inst,reg, memory);
+		sb_inst(inst, reg, memory);
 	if (op == "sh")
 		sh_inst(inst, reg, memory);
 	if (op == "sw")
 		sw_inst(inst, reg, memory);
 	if (op == "lb")
-		lb_inst(inst,reg, memory);
+		lb_inst(inst, reg, memory);
 	if (op == "lh")
 		lh_inst(inst, reg, memory);
 	if (op == "lw")
-		lw_inst(inst,reg, memory);
+		lw_inst(inst, reg, memory);
 	if (op == "lbu")
-		lbu_inst(inst,reg, memory);
+		lbu_inst(inst, reg, memory);
 	if (op == "lhu")
 		lhu_inst(inst, reg, memory);
 	if (op == "beq")
@@ -734,16 +734,36 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 	if (op == "jal")
 		jal_inst(inst, reg, label, jump);
 	if (op == "lui")
-		lui_inst(inst,reg);
+		lui_inst(inst, reg);
 	if (op == "auipc")
-		auipc_inst(inst,reg,jump);
+		auipc_inst(inst, reg, jump);
 	if ((op == "fence") || (op == "ecall") || (op == "ebreak"))
 		jump = (lines.size() * 4);
 }
 
+void disp_init(unordered_map<int, int> memory, unordered_map<string, int> reg)
+{
+	cout << "Memory: ";
+	for (auto i : memory)
+	{
+		cout << i.first << " = " << i.second<<"   ";
+	}
+	cout << endl;
+	cout << "Registers: ";
+	for (auto x : reg)
+	{
+		/*if (x.second != 0)
+			cout << x.first << " = " << x.second<<"   ";*/
+		cout << x.first << " = " << x.second << "   ";
+	}
+	cout << endl;
+}
 
 int main()
 {
+	char hor = '-';           // Change to other characters if available
+	int tab = 18 * (3 + 1 + 4) + 1;
+
 	ifstream inst("instructions.txt");
 	ifstream reg_init("initialReg.txt");
 	ifstream memory_init("initialMem.txt");
@@ -754,17 +774,25 @@ int main()
 	read_instruction(inst, lines, label);
 	read_initial(reg_init, memory_init, reg, memory);
 	int pc = 0;
-	while(pc!=(lines.size()*4))
+	cout << "PC = " << pc << endl;
+	disp_init(memory, reg);
+	cout << string(tab, hor);
+	while (pc != (lines.size() * 4))
 	{
 		//cout<<lines.at(j)<<endl;
 		int jump = pc;
-		operation_divider(lines.at(pc), reg, label, memory, jump);
+		operation_divider(lines.at(pc), reg, label, memory, jump,lines);
+		cout << endl << "PC = " << pc << endl;
+		cout << lines.at(pc) << endl;
+		disp_init(memory, reg);
+		cout << string(tab, hor);
 		if (jump == pc)
 			pc = pc + 4;
 		else
 			pc = jump;
+		
 	}
-	cout << pc << endl;
+	//cout << pc << endl;
 
 	for (auto x : lines)
 	{
