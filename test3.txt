@@ -1,0 +1,10 @@
+add t1,zero,zero
+loop: add t2, a1, t1
+sub t3, a0, t1
+lw t4, 0(t2)
+lw t5, 0(t3)
+sw t4, 0(t3)
+sw t5, 0(t2)
+addi t1,t1,4
+blt t1,a0,loop
+ecall

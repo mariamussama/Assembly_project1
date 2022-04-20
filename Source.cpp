@@ -24,6 +24,8 @@ void det_op(string& operation, string line) //extract label and operation
 		else
 			Temp = Temp + line[i];
 		i++;
+		if ((Temp == "fence") || (Temp == "ecall") || (Temp == "ebreak"))
+			break;
 	}
 	operation = Temp;
 }
@@ -47,14 +49,14 @@ void det_label(string& label, string line)
 }
 
 //read instructions and save them in the corresponding unordered map(lines) and labels
-void read_instruction(ifstream& file, unordered_map<int, string>& lines, unordered_map<string, int>& label)
+void read_instruction(ifstream& file, unordered_map<int, string>& lines, unordered_map<string, int>& label,int pc)
 {
 	string inst, lab = "";
 	if (!file.is_open())
 		cout << "Can't open file" << endl;
 	else
 	{
-		int i = 0;
+		int i = pc;
 		while (getline(file, inst))
 		{
 			lines[i] = inst;
@@ -70,7 +72,7 @@ void read_instruction(ifstream& file, unordered_map<int, string>& lines, unorder
 
 }
 //read the initial values of some reg and memory locations
-void read_initial(ifstream& reg, ifstream& memory, unordered_map<string, int>& R, unordered_map<int, int>& M)
+void read_initial(ifstream& reg, ifstream& memory, unordered_map<string, int>& R, unordered_map<int, int>& M, int&pc)
 {
 	string inst;
 	if (!reg.is_open() || !memory.is_open())
@@ -81,8 +83,14 @@ void read_initial(ifstream& reg, ifstream& memory, unordered_map<string, int>& R
 		{
 			string r; int value;
 			reg >> r >> value;
-			if (r != "")
+			if (r=="pc")
+				pc=value;
+			else 
+			{
+				if (r != "")
 				R[r] = value;
+			}
+
 		}
 		while (memory)
 		{
@@ -419,24 +427,16 @@ void or_inst(string inst, unordered_map<string, int>& reg) // or instruction
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "or", reg);
-	if (reg.at(rs1) || reg.at(rs2))
-		reg[rd] = 1;
-	else
-		reg[rd] = 0;
-	//cout << rd << " " << rs1 << " " << rs2 << endl;
+	reg[rd] = reg.at(rs1) | reg.at(rs2);
 }
 void and_inst(string inst, unordered_map<string, int>& reg) // and instruction 
 {
 	//cout << "and" << endl;
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "and", reg);
-	if (reg.at(rs1) && reg.at(rs2))
-		reg[rd] = 1;
-	else
-		reg[rd] = 0;
-	//cout << rd << " " << rs1 << " " << rs2 << endl;
-}
-/////////////////////////////////
+	reg[rd] = reg.at(rs1) & reg.at(rs2);
+
+}/////////////////////////////////
 void slli_inst(string inst, unordered_map<string, int>& reg) // shift left logical immediate instruction  
 {
 	string rd, rs1; int val;
@@ -498,21 +498,13 @@ void ori_inst(string inst, unordered_map<string, int>& reg) // or immediate inst
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "ori", reg);
-	if (reg.at(rs1) || val)
-		reg[rd] = 1;
-	else
-		reg[rd] = 0;
-	//cout << rd << " " << rs1 << " " << val << endl;
+	reg[rd] = reg.at(rs1) | val;
 }
 void andi_inst(string inst, unordered_map<string, int>& reg) // and immediate instruction 
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "andi", reg);
-	if (reg.at(rs1) && val)
-		reg[rd] = 1;
-	else
-		reg[rd] = 0;
-	//cout << rd << " " << rs1 << " " << val << endl;
+	reg[rd] = reg.at(rs1) & val;
 }
 /////////////////////////////////
 void sb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store byte instruction 
@@ -520,10 +512,19 @@ void sb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	string rs1, rs2; int offset;
 	store_op(rs1, rs2, offset, inst, "sb",reg);
 	int8_t temp = reg.at(rs1);
+	cout <<rs1<<" " << temp << endl;
 	int addr = reg.at(rs2) + offset;
+	int rem = addr % 4;
+	addr = addr - rem;
 	if (memory.find(addr) == memory.end())
 		memory[addr] = 0;
-	memory[addr] = temp;
+	bitset<32> x=bitset<32>(memory.at(addr));
+	bitset<8> y = bitset<8>(temp);
+	for (int i = 0; i < 8; i++)
+	{
+		x[i + 8 * rem] = y[i];
+	}
+	memory[addr] = x.to_ulong();
 	//cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store halfword instruction 
@@ -532,16 +533,35 @@ void sh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	store_op(rs1, rs2, offset, inst, "sh",reg);
 	int16_t temp = reg.at(rs1);
 	int addr = reg.at(rs2) + offset;
+	int rem = addr % 4;
+	addr = addr - rem;
 	if (memory.find(addr) == memory.end())
 		memory[addr] = 0;
-	memory[addr] = temp;
+	bitset<32> x = bitset<32>(memory.at(addr));
+	bitset<16> y = bitset<16>(temp);
+	for (int i = 0; i < 8; i++)
+	{
+		x[i + 8 * rem] = y[i];
+	}
+	memory[addr] = x.to_ulong();
+	addr = reg.at(rs2) + offset + 1;
+	rem = addr % 4;
+	addr = addr - rem;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	bitset<32> z = bitset<32>(memory.at(addr));
+	for (int i = 0; i < 8; i++)
+	{
+		z[i + 8 * rem] = y[i+8];
+	}
+	memory[addr] = z.to_ulong();
 	//cout << rs1 << " " << rs2 << " " << offset << endl;
 }
 void sw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // store word instruction 
 {
 	string rs1, rs2; int offset;
 	store_op(rs1, rs2, offset, inst, "sw",reg);
-	int32_t temp = reg.at(rs1);
+	int temp = reg.at(rs1);
 	int addr = reg.at(rs2) + offset;
 	if (memory.find(addr) == memory.end())
 		memory[addr] = 0;
@@ -554,21 +574,47 @@ void lb_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, in
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lb",reg);
 	int addr = reg.at(rs1) + offset;
+	int rem = addr % 4;
+	addr = addr - rem;
 	if (memory.find(addr) == memory.end())
 		memory[addr] = 0;
-	int8_t temp = memory.at(addr);
-	reg[rd] = temp;
+	bitset<32> x = bitset<32>(memory.at(addr));
+	bitset<8> y;
+	for (int i = 0; i < 8; i++)
+	{
+		y[i]= x[i + 8 * rem];
+	}
+	reg.at(rd)= y.to_ulong();
 	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lh_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) //  load halfword instruction 
 {
 	string rd, rs1; int offset;
 	load_op(rd, rs1, offset, inst, "lh",reg);
+	int16_t temp = reg.at(rs1);
 	int addr = reg.at(rs1) + offset;
+	int rem = addr % 4;
+	addr = addr - rem;
 	if (memory.find(addr) == memory.end())
 		memory[addr] = 0;
-	int16_t temp = memory.at(addr);
-	reg[rd] = temp;
+	bitset<32> x = bitset<32>(memory.at(addr));
+	bitset<16> y ;
+	for (int i = 0; i < 8; i++)
+	{
+		y[i]= x[i + 8 * rem];
+	}
+	reg.at(rd) = y.to_ulong();
+	addr = reg.at(rs1) + offset + 1;
+	rem = addr % 4;
+	addr = addr - rem;
+	if (memory.find(addr) == memory.end())
+		memory[addr] = 0;
+	bitset<32> z = bitset<32>(memory.at(addr));
+	for (int i = 0; i < 8; i++)
+	{
+		y[i + 8]= z[i + 8 * rem] ;
+	}
+	reg.at(rd) = z.to_ulong();
 	//cout << rd << " " << rs1 << " " << offset << endl;
 }
 void lw_inst(string inst, unordered_map<string, int>& reg, unordered_map<int, int>& memory) // load word instruction 
@@ -683,6 +729,7 @@ void jal_inst(string inst, unordered_map<string, int>& reg, unordered_map<string
 {
 	string rd, lab;
 	Jal_op(rd, lab, inst, "jal", reg);
+	if (rd!= "zero" && rd!="x0")
 	reg[rd] = jump + 4;
 	jump = label.at(lab);
 	//cout << "jump" << endl << endl;
@@ -709,12 +756,12 @@ void auipc_inst(string inst, unordered_map<string, int>& reg, int& jump) // add 
 }
 /////////////////////////////////
 //divider function that call the operation function based on the operation
-void operation_divider(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, unordered_map<int, int>& memory, int& jump, unordered_map<int, string> lines) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
+void operation_divider(string inst, unordered_map<string, int>& reg, unordered_map<string, int>& label, unordered_map<int, int>& memory, int& jump, unordered_map<int, string> lines,int exit) // string of the instruction type will be the input of this function that automaticlly calles the specific function for that operation 
 {
 	int output;
 	string op;
 	if ((inst == "fence") || (inst == "ecall") || (inst == "ebreak"))
-		jump = (lines.size() * 4);
+		jump = exit;
 	else 
 	{
 		det_op(op, inst);
@@ -799,7 +846,7 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 
 void disp_init(unordered_map<int, int> memory, unordered_map<string, int> reg)
 {
-	
+
 	std::array<string, 4> head = {
 		"Memory:",
 		"Decimal",
@@ -819,15 +866,15 @@ void disp_init(unordered_map<int, int> memory, unordered_map<string, int> reg)
 	}*/
 	cout << "Memory:" << "  " << "Decimal" << "  " << "Hexadecimal" << " " << "Binary";
 	cout << endl;
-	
+
 	for (auto i : memory)
 	{
 		cout << left << setw(space[0]) << i.first << setw(space[1]) << dec << i.second << setw(space[2]) << hex << i.second << setw(space[3]) << bitset<32>(i.second);
 		cout << endl;
-		
+
 	}
 	cout << endl;
-	
+
 	std::array<string, 4> headers = {
 		"Registers",
 		"Decimal",
@@ -848,40 +895,39 @@ void disp_init(unordered_map<int, int> memory, unordered_map<string, int> reg)
 	cout << endl;
 	for (auto x : reg)
 	{
-		
+
 		cout << left << setw(spaces[0]) << x.first << setw(spaces[1]) << dec << x.second << setw(spaces[2]) << hex << x.second << setw(spaces[3]) << bitset<32>(x.second);
 		cout << endl;
-		
+
 	}
 	cout << endl;
-	
+
 }
 
 int main()
 {
 	char hor = '-';           // Change to other characters if available
-	int tab = 80;
+	int tab = 20 * (3 + 1 + 4) + 1;
 
-	ifstream inst("instructions.txt");
-	ifstream reg_init("initialReg.txt");
-	ifstream memory_init("initialMem.txt");
+	ifstream inst("all.txt");
+	ifstream reg_init("InitialReg.txt");
+	ifstream memory_init("InitialMem.txt");
 	unordered_map<int, string> lines;
 	unordered_map<string, int> label;
 	unordered_map<string, int> reg;
 	unordered_map<int, int> memory;
-	read_instruction(inst, lines, label);
-	read_initial(reg_init, memory_init, reg, memory);
 	int pc = 0;
-	//cout << string(tab, hor)<<endl;
-	cout << "PC = " << dec << pc << " = ";
-	cout << hex << pc <<" = " << bitset<32>(pc)<<endl;
+	read_initial(reg_init, memory_init, reg, memory,pc);
+	read_instruction(inst, lines, label,pc);
+	cout << "PC = " << pc << endl;
 	disp_init(memory, reg);
 	cout << string(tab, hor);
-	while (pc != (lines.size() * 4))
+	int exit = pc + lines.size() * 4;
+	while (pc < exit)
 	{
 		//cout<<lines.at(j)<<endl;
 		int jump = pc;
-		operation_divider(lines.at(pc), reg, label, memory, jump,lines);
+		operation_divider(lines.at(pc), reg, label, memory, jump, lines,pc);
 		cout << endl;
 		cout << "PC = " << dec << pc << " = ";
 		cout << hex << pc << " = " << bitset<32>(pc) << endl;

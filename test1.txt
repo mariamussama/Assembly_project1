@@ -1,0 +1,10 @@
+addi t0, zero, 0
+addi t1, zero, 0
+loop: bge t1, a1, exit
+slli t2, t1, 2
+add t2, a0, t2
+lw t2, 0(t2)
+add t0, t0, t2
+addi t1, t1, 1
+jal zero, loop
+exit: ebreak
