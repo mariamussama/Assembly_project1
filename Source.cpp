@@ -394,12 +394,7 @@ void xor_inst(string inst, unordered_map<string, int>& reg) // exclusive or inst
 {
 	string rd, rs1, rs2;
 	three_reg(rd, rs1, rs2, inst, "xor", reg);
-	int rem1 = reg.at(rs1) % 2;
-	int rem2 = reg.at(rs2) % 2;
-	if (rem1 == rem2)
-		reg[rd] = 0;
-	else
-		reg[rd] = 1;
+	reg[rd] = reg.at(rs1) ^ reg.at(rs2);
 	//cout << rd << " " << rs1 << " " << rs2 << endl;
 }
 void srl_inst(string inst, unordered_map<string, int>& reg) // shift right logical instruction
@@ -492,12 +487,7 @@ void xori_inst(string inst, unordered_map<string, int>& reg) // exclusive or imm
 {
 	string rd, rs1; int val;
 	imm_op(rd, rs1, val, inst, "xori", reg);
-	int rem1 = reg.at(rs1) % 2;
-	int rem2 = val % 2;
-	if (rem1 == rem2)
-		reg[rd] = 0;
-	else
-		reg[rd] = 1;
+	reg[rd] = reg.at(rs1) ^ val;
 	//cout << rd << " " << rs1 << " " << val << endl;
 }
 void ori_inst(string inst, unordered_map<string, int>& reg) // or immediate instruction 
