@@ -4,6 +4,10 @@
 #include<fstream>
 #include <cstdlib>
 #include <cstdint>
+#include<iomanip>
+#include<bitset>
+#include<vector>
+#include<array>
 using namespace std;
 //determine the operation 
 void det_op(string& operation, string line) //extract label and operation
@@ -795,26 +799,68 @@ void operation_divider(string inst, unordered_map<string, int>& reg, unordered_m
 
 void disp_init(unordered_map<int, int> memory, unordered_map<string, int> reg)
 {
-	cout << "Memory: ";
+	
+	std::array<string, 4> head = {
+		"Memory:",
+		"Decimal",
+		"Hexadecimal",
+		"Binary",
+	};
+
+	int space[] = {
+		head[0].size() + 2,
+		head[1].size() + 2,
+		10 + 2,
+		30 + 2 };
+
+	/*for (int i = 0; i < head.size(); i++)
+	{
+		cout << setw(space[i]) << head[i];
+	}*/
+	cout << "Memory:" << "  " << "Decimal" << "  " << "Hexadecimal" << " " << "Binary";
+	cout << endl;
+	
 	for (auto i : memory)
 	{
-		cout << i.first << " = " << i.second<<"   ";
+		cout << left << setw(space[0]) << i.first << setw(space[1]) << dec << i.second << setw(space[2]) << hex << i.second << setw(space[3]) << bitset<32>(i.second);
+		cout << endl;
+		
 	}
 	cout << endl;
-	cout << "Registers: ";
+	
+	std::array<string, 4> headers = {
+		"Registers",
+		"Decimal",
+		"Hexadecimal",
+		"Binary",
+	};
+
+	int spaces[] = {
+		headers[0].size() + 2,
+		headers[1].size() + 2,
+		10 + 2,
+		32 + 2 };
+
+	for (int i = 0; i < headers.size(); i++)
+	{
+		cout << setw(spaces[i]) << headers[i];
+	}
+	cout << endl;
 	for (auto x : reg)
 	{
-		/*if (x.second != 0)
-			cout << x.first << " = " << x.second<<"   ";*/
-		cout << x.first << " = " << x.second << "   ";
+		
+		cout << left << setw(spaces[0]) << x.first << setw(spaces[1]) << dec << x.second << setw(spaces[2]) << hex << x.second << setw(spaces[3]) << bitset<32>(x.second);
+		cout << endl;
+		
 	}
 	cout << endl;
+	
 }
 
 int main()
 {
 	char hor = '-';           // Change to other characters if available
-	int tab = 20 * (3 + 1 + 4) + 1;
+	int tab = 80;
 
 	ifstream inst("instructions.txt");
 	ifstream reg_init("initialReg.txt");
@@ -826,7 +872,9 @@ int main()
 	read_instruction(inst, lines, label);
 	read_initial(reg_init, memory_init, reg, memory);
 	int pc = 0;
-	cout << "PC = " << pc << endl;
+	//cout << string(tab, hor)<<endl;
+	cout << "PC = " << dec << pc << " = ";
+	cout << hex << pc <<" = " << bitset<32>(pc)<<endl;
 	disp_init(memory, reg);
 	cout << string(tab, hor);
 	while (pc != (lines.size() * 4))
@@ -834,7 +882,9 @@ int main()
 		//cout<<lines.at(j)<<endl;
 		int jump = pc;
 		operation_divider(lines.at(pc), reg, label, memory, jump,lines);
-		cout << endl << "PC = " << pc << endl;
+		cout << endl;
+		cout << "PC = " << dec << pc << " = ";
+		cout << hex << pc << " = " << bitset<32>(pc) << endl;
 		cout << lines.at(pc) << endl;
 		disp_init(memory, reg);
 		cout << string(tab, hor);
